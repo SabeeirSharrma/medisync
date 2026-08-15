@@ -26,6 +26,12 @@ export default function RecordsPage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
+  function downloadExport(format: "csv" | "pdf") {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    const url = `${API_URL}/api/records/export/${format}`;
+    window.open(url, "_blank");
+  }
+
   useEffect(() => {
     apiFetch<{ user: User }>("/api/auth/me")
       .then((res) => {
@@ -71,7 +77,29 @@ export default function RecordsPage() {
       </header>
 
       <main className="mx-auto max-w-4xl px-6 py-8">
-        <h2 className="text-xl font-medium">Medical Records</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-medium">Medical Records</h2>
+          <div className="flex gap-2">
+            <Link
+              href="/records/new"
+              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              Add Record
+            </Link>
+            <button
+              onClick={() => downloadExport("csv")}
+              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            >
+              Export CSV
+            </button>
+            <button
+              onClick={() => downloadExport("pdf")}
+              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            >
+              Export PDF
+            </button>
+          </div>
+        </div>
 
         {data && data.records.length > 0 ? (
           <>
@@ -87,7 +115,11 @@ export default function RecordsPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {data.records.map((record) => (
-                    <tr key={record.id} className="hover:bg-gray-50">
+                    <tr
+                      key={record.id}
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => router.push(`/records/${record.id}`)}
+                    >
                       <td className="px-4 py-3">
                         <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
                           {record.type.replace("_", " ")}

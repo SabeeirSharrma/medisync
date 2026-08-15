@@ -15,6 +15,13 @@
       "when": 1786795369764,
       "tag": "0001_chilly_george_stacy",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786797431436,
+      "tag": "0002_long_cobalt_man",
+      "breakpoints": true
     }
   ]
 }

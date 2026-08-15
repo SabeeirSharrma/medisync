@@ -65,6 +65,9 @@ export interface MedicalRecord {
   doctorName: string | null;
   hospitalName: string | null;
   details: Record<string, unknown>;
+  attachmentKey: string | null;
+  contentType: string | null;
+  fileSize: number | null;
   softDeleted: boolean;
   versionOf: string | null;
   createdAt: Date;

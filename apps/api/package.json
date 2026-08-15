@@ -13,13 +13,17 @@
   },
   "dependencies": {
     "@medisync/shared": "workspace:*",
+    "@aws-sdk/client-s3": "^3.800.0",
+    "@aws-sdk/s3-request-presigner": "^3.800.0",
     "drizzle-orm": "^0.45.2",
     "pg": "^8.23.0",
     "fastify": "^5.12.0",
     "@fastify/cookie": "^11.1.2",
     "@fastify/cors": "^11.3.0",
+    "@fastify/multipart": "^9.0.3",
     "@fastify/sensible": "^6.0.5",
     "@node-rs/argon2": "^2.1.0",
+    "puppeteer": "^24.8.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

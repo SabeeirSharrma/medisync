@@ -6,6 +6,7 @@ import {
   date,
   timestamp,
   boolean,
+  integer,
   jsonb,
   index,
 } from "drizzle-orm/pg-core";
@@ -114,6 +115,9 @@ export const records = pgTable(
     doctorName: text("doctor_name"),
     hospitalName: text("hospital_name"),
     details: jsonb("details").notNull().default({}),
+    attachmentKey: text("attachment_key"),
+    contentType: text("content_type"),
+    fileSize: integer("file_size"),
     softDeleted: boolean("soft_deleted").notNull().default(false),
     versionOf: uuid("version_of"),
     createdAt: timestamp("created_at", { withTimezone: true })
