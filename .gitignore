@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.next/
+.env
+.env.local
+*.log
+
+# Planning files
+spec.md
+plans.md
+/.omo/

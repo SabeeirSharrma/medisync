@@ -1,0 +1,15 @@
+{
+  "name": "medisync",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:api": "bun run --filter @medisync/api dev",
+    "dev:web": "bun run --filter @medisync/web dev",
+    "dev": "bun run --filter '*' dev",
+    "db:generate": "bun run --filter @medisync/api db:generate",
+    "db:migrate": "bun run --filter @medisync/api db:migrate",
+    "db:push": "bun run --filter @medisync/api db:push",
+    "build": "bun run --filter '*' build",
+    "typecheck": "bun run --filter '*' typecheck"
+  }
+}
