@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { db } from "../db/index.js";
-import { records, accessRequests } from "../db/schema.js";
-import { eq, and, desc, count, inArray, gte, lte } from "drizzle-orm";
+import { records, accessRequests, emergencyAccess, guardianLink } from "../db/schema.js";
+import { eq, and, or, desc, count, inArray, gte, lte } from "drizzle-orm";
 import { requireAuth } from "../middleware/auth.js";
 import { createRecordSchema } from "../lib/validation.js";
 import { logAudit } from "../lib/audit.js";
@@ -135,6 +135,7 @@ export default async function recordRoutes(app: FastifyInstance) {
     if (user.role === "patient") {
       whereConditions.push(eq(records.patientId, user.id));
     } else if (user.role === "doctor") {
+      // Check approved access requests
       const approvedAccess = await db
         .select({ patientId: accessRequests.patientId })
         .from(accessRequests)
@@ -145,14 +146,48 @@ export default async function recordRoutes(app: FastifyInstance) {
           ),
         );
 
-      const patientIds = approvedAccess.map((a) => a.patientId);
+      // Check active emergency access (break-glass)
+      const now = new Date();
+      const emergencyAccesses = await db
+        .select({ patientId: emergencyAccess.patientId })
+        .from(emergencyAccess)
+        .where(
+          and(
+            eq(emergencyAccess.doctorId, user.id),
+            eq(emergencyAccess.status, "active"),
+            gte(emergencyAccess.expiresAt, now),
+          ),
+        );
 
-      if (patientIds.length === 0) {
+      // Check active guardian links (shared control)
+      const guardianAccesses = await db
+        .select({ patientId: guardianLink.patientId })
+        .from(guardianLink)
+        .where(
+          and(
+            eq(guardianLink.guardianId, user.id),
+            or(
+              eq(guardianLink.status, "active_shared_control"),
+              eq(guardianLink.status, "sole_active"),
+            ),
+          ),
+        );
+
+      const approvedPatientIds = approvedAccess.map((a) => a.patientId);
+      const emergencyPatientIds = emergencyAccesses.map((a) => a.patientId);
+      const guardianPatientIds = guardianAccesses.map((a) => a.patientId);
+      const allPatientIds = Array.from(
+        new Set([...approvedPatientIds, ...emergencyPatientIds, ...guardianPatientIds]),
+      );
+
+      if (allPatientIds.length === 0) {
         return reply.send({ records: [], total: 0, page, totalPages: 0 });
       }
 
-      whereConditions.push(inArray(records.patientId, patientIds));
+      whereConditions.push(inArray(records.patientId, allPatientIds));
 
+      // Apply scope filters from approved access requests
+      // Emergency access and guardian access have NO scope filtering (full access)
       for (const access of approvedAccess) {
         const [fullAccess] = await db
           .select({ scope: accessRequests.scope })
@@ -173,14 +208,20 @@ export default async function recordRoutes(app: FastifyInstance) {
             dateTo?: string | null;
           };
 
-          if (scope.categories && scope.categories.length > 0) {
-            whereConditions.push(inArray(records.type, scope.categories as any));
-          }
-          if (scope.dateFrom) {
-            whereConditions.push(gte(records.date, scope.dateFrom));
-          }
-          if (scope.dateTo) {
-            whereConditions.push(lte(records.date, scope.dateTo));
+          const hasEmergency = emergencyPatientIds.includes(access.patientId);
+          const hasGuardian = guardianPatientIds.includes(access.patientId);
+
+          // Only apply scope if NO emergency access AND NO guardian access
+          if (!hasEmergency && !hasGuardian) {
+            if (scope.categories && scope.categories.length > 0) {
+              whereConditions.push(inArray(records.type, scope.categories as any));
+            }
+            if (scope.dateFrom) {
+              whereConditions.push(gte(records.date, scope.dateFrom));
+            }
+            if (scope.dateTo) {
+              whereConditions.push(lte(records.date, scope.dateTo));
+            }
           }
         }
       }
@@ -234,39 +275,77 @@ export default async function recordRoutes(app: FastifyInstance) {
     }
 
     if (user.role === "doctor") {
-      const [access] = await db
+      // Check for active emergency access (break-glass)
+      const now = new Date();
+      const [emergency] = await db
         .select()
-        .from(accessRequests)
+        .from(emergencyAccess)
         .where(
           and(
-            eq(accessRequests.doctorId, user.id),
-            eq(accessRequests.patientId, record.patientId),
-            eq(accessRequests.status, "approved"),
+            eq(emergencyAccess.doctorId, user.id),
+            eq(emergencyAccess.patientId, record.patientId),
+            eq(emergencyAccess.status, "active"),
+            gte(emergencyAccess.expiresAt, now),
           ),
         )
         .limit(1);
 
-      if (!access) {
-        return reply.code(403).send({ error: "Access denied" });
-      }
+      if (!emergency) {
+        // Check for active guardian link (shared control)
+        const [guardian] = await db
+          .select()
+          .from(guardianLink)
+          .where(
+            and(
+              eq(guardianLink.guardianId, user.id),
+              eq(guardianLink.patientId, record.patientId),
+              or(
+                eq(guardianLink.status, "active_shared_control"),
+                eq(guardianLink.status, "sole_active"),
+              ),
+            ),
+          )
+          .limit(1);
 
-      const scope = access.scope as {
-        categories?: string[] | null;
-        dateFrom?: string | null;
-        dateTo?: string | null;
-      };
+        if (!guardian) {
+          // No guardian access — check normal approved access
+          const [access] = await db
+            .select()
+            .from(accessRequests)
+            .where(
+              and(
+                eq(accessRequests.doctorId, user.id),
+                eq(accessRequests.patientId, record.patientId),
+                eq(accessRequests.status, "approved"),
+              ),
+            )
+            .limit(1);
 
-      if (scope.categories && scope.categories.length > 0) {
-        if (!scope.categories.includes(record.type)) {
-          return reply.code(403).send({ error: "Access denied for this record type" });
+          if (!access) {
+            return reply.code(403).send({ error: "Access denied" });
+          }
+
+          const scope = access.scope as {
+            categories?: string[] | null;
+            dateFrom?: string | null;
+            dateTo?: string | null;
+          };
+
+          if (scope.categories && scope.categories.length > 0) {
+            if (!scope.categories.includes(record.type)) {
+              return reply.code(403).send({ error: "Access denied for this record type" });
+            }
+          }
+          if (scope.dateFrom && record.date < scope.dateFrom) {
+            return reply.code(403).send({ error: "Access denied for this date range" });
+          }
+          if (scope.dateTo && record.date > scope.dateTo) {
+            return reply.code(403).send({ error: "Access denied for this date range" });
+          }
         }
+        // If guardian access exists, skip scope checks (shared control = full access)
       }
-      if (scope.dateFrom && record.date < scope.dateFrom) {
-        return reply.code(403).send({ error: "Access denied for this date range" });
-      }
-      if (scope.dateTo && record.date > scope.dateTo) {
-        return reply.code(403).send({ error: "Access denied for this date range" });
-      }
+      // If emergency access exists, skip scope checks (full access during emergency)
     }
 
     await logAudit({

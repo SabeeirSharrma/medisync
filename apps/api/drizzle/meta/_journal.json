@@ -22,6 +22,34 @@
       "when": 1786797431436,
       "tag": "0002_long_cobalt_man",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786798093741,
+      "tag": "0003_numerous_malice",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1786798972828,
+      "tag": "0004_jazzy_young_avengers",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786801538116,
+      "tag": "0005_ordinary_emma_frost",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786801808234,
+      "tag": "0006_cuddly_mac_gargan",
+      "breakpoints": true
     }
   ]
 }

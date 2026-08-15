@@ -168,3 +168,83 @@ export interface CreateAccessRequestRequest {
 export interface ApproveAccessRequestRequest {
   scope: AccessRequestScope;
 }
+
+export type EmergencyAccessReasonCode =
+  | "cardiac_arrest"
+  | "stroke"
+  | "trauma"
+  | "unconscious"
+  | "severe_bleeding"
+  | "respiratory_failure"
+  | "sepsis"
+  | "other";
+
+export type EmergencyAccessStatus = "active" | "revoked" | "expired";
+
+export interface EmergencyAccess {
+  id: string;
+  doctorId: string;
+  patientId: string;
+  reasonCode: EmergencyAccessReasonCode;
+  reasonText: string;
+  status: EmergencyAccessStatus;
+  grantedAt: string;
+  expiresAt: string;
+  patientNotifiedAt: string | null;
+  createdAt: Date;
+}
+
+export interface EmergencyAccessWithUser extends EmergencyAccess {
+  doctorName?: string;
+  doctorEmail?: string;
+  patientName?: string;
+  patientEmail?: string;
+}
+
+export interface CreateEmergencyAccessRequest {
+  patientEmail: string;
+  reasonCode: EmergencyAccessReasonCode;
+  reasonText: string;
+}
+
+export type GuardianTriggerType = "minor" | "advance_directive" | "emergency_incapacity";
+export type GuardianStatus =
+  | "pending_guardian"
+  | "pending_senior"
+  | "active_shared_control"
+  | "sole_active"
+  | "denied"
+  | "revoked"
+  | "expired";
+
+export interface GuardianLink {
+  id: string;
+  patientId: string;
+  guardianId: string;
+  triggerType: GuardianTriggerType;
+  status: GuardianStatus;
+  authorityDocumentRef: string | null;
+  ageMajorityDate: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  activatedAt: Date | null;
+  revokedAt: Date | null;
+}
+
+export interface GuardianLinkWithUser extends GuardianLink {
+  patientName?: string;
+  patientEmail?: string;
+  guardianName?: string;
+  guardianEmail?: string;
+}
+
+export interface CreateGuardianLinkRequest {
+  patientEmail: string;
+  guardianEmail: string;
+  triggerType: GuardianTriggerType;
+  authorityDocumentRef?: string;
+}
+
+export interface UpdateGuardianStatusRequest {
+  status: GuardianStatus;
+}

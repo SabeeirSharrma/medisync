@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { db } from "../db/index.js";
-import { records, accessRequests, users } from "../db/schema.js";
-import { eq, and, inArray, gte, lte } from "drizzle-orm";
+import { records, accessRequests, emergencyAccess, guardianLink, users } from "../db/schema.js";
+import { eq, and, inArray, gte, lte, or } from "drizzle-orm";
 import { requireAuth } from "../middleware/auth.js";
 import { logAudit } from "../lib/audit.js";
 
@@ -66,9 +66,40 @@ async function getAccessibleRecords(
         ),
       );
 
-    const patientIds = approvedAccess.map((a) => a.patientId);
-    if (patientIds.length === 0) return [];
-    conditions.push(inArray(records.patientId, patientIds));
+    const now = new Date();
+    const emergencyAccesses = await db
+      .select({ patientId: emergencyAccess.patientId })
+      .from(emergencyAccess)
+      .where(
+        and(
+          eq(emergencyAccess.doctorId, userId),
+          eq(emergencyAccess.status, "active"),
+          gte(emergencyAccess.expiresAt, now),
+        ),
+      );
+
+    const guardianAccesses = await db
+      .select({ patientId: guardianLink.patientId })
+      .from(guardianLink)
+      .where(
+        and(
+          eq(guardianLink.guardianId, userId),
+          or(
+            eq(guardianLink.status, "active_shared_control"),
+            eq(guardianLink.status, "sole_active"),
+          ),
+        ),
+      );
+
+    const approvedPatientIds = approvedAccess.map((a) => a.patientId);
+    const emergencyPatientIds = emergencyAccesses.map((a) => a.patientId);
+    const guardianPatientIds = guardianAccesses.map((a) => a.patientId);
+    const allPatientIds = Array.from(
+      new Set([...approvedPatientIds, ...emergencyPatientIds, ...guardianPatientIds]),
+    );
+
+    if (allPatientIds.length === 0) return [];
+    conditions.push(inArray(records.patientId, allPatientIds));
   } else {
     conditions.push(eq(records.patientId, userId));
   }

@@ -1,0 +1,91 @@
+# docker-compose.prod.yml - Production overrides
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  postgres:
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 4G
+
+  minio:
+    environment:
+      MINIO_ROOT_PASSWORD_FILE: /run/secrets/minio_password
+    secrets:
+      - minio_password
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+
+  api:
+    environment:
+      SESSION_SECRET_FILE: /run/secrets/session_secret
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      MINIO_ROOT_PASSWORD_FILE: /run/secrets/minio_password
+    secrets:
+      - session_secret
+      - postgres_password
+      - minio_password
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+
+  web:
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.medisync.local}
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+
+  # Traefik reverse proxy with automatic HTTPS
+  traefik:
+    image: traefik:v3.0
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL:-admin@medisync.local}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "letsencrypt:/letsencrypt"
+    profiles:
+      - proxy
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  minio_password:
+    file: ./secrets/minio_password.txt
+  session_secret:
+    file: ./secrets/session_secret.txt
+
+volumes:
+  letsencrypt:

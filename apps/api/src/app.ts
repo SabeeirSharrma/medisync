@@ -8,6 +8,10 @@ import authRoutes from "./routes/auth.js";
 import recordRoutes from "./routes/records.js";
 import accessRequestRoutes from "./routes/access-requests.js";
 import exportRoutes from "./routes/export.js";
+import emergencyAccessRoutes from "./routes/emergency-access.js";
+import guardianRoutes from "./routes/guardian.js";
+import incapacityRoutes from "./routes/incapacity.js";
+import deceasedRoutes from "./routes/deceased.js";
 
 export async function buildApp() {
   const app = Fastify({ logger: true });
@@ -24,6 +28,10 @@ export async function buildApp() {
   await app.register(recordRoutes, { prefix: "/api" });
   await app.register(accessRequestRoutes, { prefix: "/api" });
   await app.register(exportRoutes, { prefix: "/api" });
+  await app.register(emergencyAccessRoutes, { prefix: "/api" });
+  await app.register(guardianRoutes, { prefix: "/api" });
+  await app.register(incapacityRoutes, { prefix: "/api" });
+  await app.register(deceasedRoutes, { prefix: "/api" });
 
   app.get("/api/health", async () => ({ status: "ok" }));
 
