@@ -5,6 +5,10 @@ import { db } from "../db/index.js";
 import { users, records } from "../db/schema.js";
 import { requireAuth } from "../middleware/auth.js";
 import { logAudit } from "../lib/audit.js";
+import {
+  summarizePatientRecords,
+  summarizeRecord,
+} from "../lib/ai.js";
 import { z } from "zod/v4";
 
 const summarizePatientSchema = z.object({
@@ -18,7 +22,6 @@ const summarizeRecordSchema = z.object({
 });
 
 export default async function aiRoutes(app: FastifyInstance) {
-  // POST /api/patients/:patientId/summarize — AI summary of patient records (stub)
   app.post(
     "/patients/:patientId/summarize",
     { preHandler: requireAuth },
@@ -26,7 +29,6 @@ export default async function aiRoutes(app: FastifyInstance) {
       const user = request.user!;
       const { patientId } = request.params as { patientId: string };
 
-      // Only doctors with access or the patient themselves can request summary
       if (user.role !== "admin" && user.id !== patientId) {
         return reply.code(403).send({ error: "Access denied" });
       }
@@ -36,7 +38,6 @@ export default async function aiRoutes(app: FastifyInstance) {
         return reply.code(400).send({ error: parsed.error.message });
       }
 
-      // Verify patient exists
       const [patient] = await db
         .select()
         .from(users)
@@ -47,18 +48,26 @@ export default async function aiRoutes(app: FastifyInstance) {
         return reply.code(404).send({ error: "Patient not found" });
       }
 
-      // Fetch patient records (filtered by optional params)
-      const whereConditions = [eq(records.patientId, patientId)];
-
-      if (parsed.data.recordTypes && parsed.data.recordTypes.length > 0) {
-        // Filter by record types - using inArray would be needed here
-        // For stub, we'll include all and note the filter in response
-      }
-
-      const patientRecords = await db
+      let patientRecords = await db
         .select()
         .from(records)
         .where(eq(records.patientId, patientId));
+
+      if (parsed.data.recordTypes && parsed.data.recordTypes.length > 0) {
+        const types = parsed.data.recordTypes;
+        patientRecords = patientRecords.filter((r) => types.includes(r.type));
+      }
+
+      if (parsed.data.dateFrom) {
+        patientRecords = patientRecords.filter(
+          (r) => r.date >= parsed.data.dateFrom!,
+        );
+      }
+      if (parsed.data.dateTo) {
+        patientRecords = patientRecords.filter(
+          (r) => r.date <= parsed.data.dateTo!,
+        );
+      }
 
       await logAudit({
         actorId: user.id,
@@ -68,28 +77,26 @@ export default async function aiRoutes(app: FastifyInstance) {
         details: { aiSummaryRequest: true, recordCount: patientRecords.length },
       });
 
-      // STUB: In production, this would call an AI service
-      return reply.send({
-        patientId,
-        patientName: patient.name,
-        recordCount: patientRecords.length,
-        summary: {
-          status: "stub",
-          message: "AI summarization not yet implemented. This endpoint is a placeholder for future AI integration.",
-          recordTypes: parsed.data.recordTypes ?? ["all"],
-          dateRange: {
-            from: parsed.data.dateFrom ?? "all",
-            to: parsed.data.dateTo ?? "now",
-          },
-          recordsAnalyzed: patientRecords.length,
-          // In production: would return actual AI-generated summary
-          placeholder: "AI summary would appear here once integrated with an LLM provider.",
+      const summary = await summarizePatientRecords(
+        patient.name,
+        patientRecords.map((r) => ({
+          type: r.type,
+          date: r.date,
+          doctorName: r.doctorName,
+          hospitalName: r.hospitalName,
+          details: (r.details ?? {}) as Record<string, unknown>,
+        })),
+        {
+          recordTypes: parsed.data.recordTypes,
+          dateFrom: parsed.data.dateFrom,
+          dateTo: parsed.data.dateTo,
         },
-      });
+      );
+
+      return reply.send({ patientId, patientName: patient.name, ...summary });
     },
   );
 
-  // POST /api/records/:recordId/summarize — AI summary of a specific record (stub)
   app.post(
     "/records/:recordId/summarize",
     { preHandler: requireAuth },
@@ -102,7 +109,6 @@ export default async function aiRoutes(app: FastifyInstance) {
         return reply.code(400).send({ error: parsed.error.message });
       }
 
-      // Find the record
       const [record] = await db
         .select()
         .from(records)
@@ -113,7 +119,6 @@ export default async function aiRoutes(app: FastifyInstance) {
         return reply.code(404).send({ error: "Record not found" });
       }
 
-      // Check access: patient themselves, or doctor with approved access
       const isOwner = user.id === record.patientId;
       const isAdmin = user.role === "admin";
 
@@ -129,21 +134,20 @@ export default async function aiRoutes(app: FastifyInstance) {
         details: { aiSummaryRequest: true, recordId },
       });
 
-      // STUB: In production, this would call an AI service
-      return reply.send({
-        recordId,
-        recordType: record.type,
-        summary: {
-          status: "stub",
-          message: "AI summarization not yet implemented. This endpoint is a placeholder for future AI integration.",
-          recordType: record.type,
+      const summary = await summarizeRecord(
+        {
+          type: record.type,
           date: record.date,
           doctorName: record.doctorName,
           hospitalName: record.hospitalName,
-          // In production: would return actual AI-generated summary
-          placeholder: "AI summary of this specific record would appear here once integrated with an LLM provider.",
-          includeHistory: parsed.data.includeHistory ?? false,
+          details: (record.details ?? {}) as Record<string, unknown>,
         },
+        parsed.data.includeHistory,
+      );
+
+      return reply.send({
+        recordId,
+        ...summary,
       });
     },
   );

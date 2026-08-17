@@ -84,6 +84,13 @@ class ApiService {
     return response;
   }
   
+  static String? _extractSessionCookie(http.Response response) {
+    final setCookie = response.headers['set-cookie'];
+    if (setCookie == null) return null;
+    final match = RegExp(r'session=([^;]+)').firstMatch(setCookie);
+    return match?.group(1);
+  }
+  
   static T _parseResponse<T>(http.Response response, T Function(Map<String, dynamic>) fromJson) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -112,8 +119,18 @@ class ApiService {
       if (phone != null) 'phone': phone,
     });
     
+    final sessionToken = _extractSessionCookie(response);
+    if (sessionToken != null) {
+      await saveToken(sessionToken);
+    }
+    
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     final user = User.fromJson(data['user'] as Map<String, dynamic>);
+    
+    // Save user data for session persistence
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user', jsonEncode(data['user']));
+    
     return user;
   }
   
@@ -126,13 +143,25 @@ class ApiService {
       'password': password,
     });
     
+    final sessionToken = _extractSessionCookie(response);
+    if (sessionToken != null) {
+      await saveToken(sessionToken);
+    }
+    
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     final user = User.fromJson(data['user'] as Map<String, dynamic>);
+    
+    // Save user data for session persistence
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user', jsonEncode(data['user']));
+    
     return user;
   }
   
   static Future<void> logout() async {
     await _request('POST', '/api/auth/logout');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user');
   }
   
   static Future<User> getMe() async {

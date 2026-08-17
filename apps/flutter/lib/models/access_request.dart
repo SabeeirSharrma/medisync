@@ -1,4 +1,6 @@
 // apps/flutter/lib/models/access_request.dart
+import 'package:flutter/material.dart';
+
 class AccessRequest {
   final String id;
   final String doctorId;

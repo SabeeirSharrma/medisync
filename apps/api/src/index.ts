@@ -2,6 +2,8 @@ import { buildApp } from "./app.js";
 import { config } from "./config.js";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { s3 } from "./lib/s3.js";
+import { CreateBucketCommand, HeadBucketCommand } from "@aws-sdk/client-s3";
 import pg from "pg";
 
 const pool = new pg.Pool({ connectionString: config.databaseUrl });
@@ -16,6 +18,14 @@ try {
   process.exit(1);
 } finally {
   await pool.end();
+}
+
+try {
+  await s3.send(new HeadBucketCommand({ Bucket: config.s3Bucket }));
+} catch {
+  console.log(`Bucket "${config.s3Bucket}" not found, creating...`);
+  await s3.send(new CreateBucketCommand({ Bucket: config.s3Bucket }));
+  console.log(`Bucket "${config.s3Bucket}" created`);
 }
 
 try {

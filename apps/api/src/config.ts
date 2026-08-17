@@ -11,4 +11,6 @@ export const config = {
   s3SecretKey: process.env.S3_SECRET_KEY || "medisync_dev",
   s3Bucket: process.env.S3_BUCKET || "medisync",
   s3Region: process.env.S3_REGION || "us-east-1",
+  openaiApiKey: process.env.OPENAI_API_KEY,
+  openaiModel: process.env.OPENAI_MODEL || "gpt-4o-mini",
 };

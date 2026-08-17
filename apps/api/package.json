@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "bunx tsx src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "db:generate": "bunx drizzle-kit generate",
     "db:migrate": "bunx tsx src/db/migrate.ts",
     "db:push": "bunx drizzle-kit push",
@@ -23,13 +25,17 @@
     "@fastify/multipart": "^9.0.3",
     "@fastify/sensible": "^6.0.5",
     "@node-rs/argon2": "^2.1.0",
+    "openai": "^4.80.0",
     "puppeteer": "^24.8.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/pg": "^8",
+    "@types/supertest": "^6",
     "drizzle-kit": "^0.31.10",
+    "supertest": "^7.1.0",
     "typescript": "^7.0.0",
-    "tsx": "^4"
+    "tsx": "^4",
+    "vitest": "^3.2.1"
   }
 }

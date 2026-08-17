@@ -1,4 +1,5 @@
 // apps/flutter/lib/screens/access_requests_screen.dart
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -81,7 +82,7 @@ class _AccessRequestsScreenState extends State<AccessRequestsScreen> {
             onPressed: () {
               try {
                 final scope = Map<String, dynamic>.from(
-                  Uri.decodeComponent(scopeController.text) as Map,
+                  jsonDecode(scopeController.text) as Map,
                 );
                 Navigator.of(context).pop(true);
               } catch (e) {
@@ -99,7 +100,7 @@ class _AccessRequestsScreenState extends State<AccessRequestsScreen> {
     if (confirmed == true) {
       try {
         final scope = Map<String, dynamic>.from(
-          Uri.decodeComponent(scopeController.text) as Map,
+          jsonDecode(scopeController.text) as Map,
         );
         await ApiService.approveAccessRequest(
           id: request.id,

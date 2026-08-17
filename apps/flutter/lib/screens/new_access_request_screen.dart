@@ -1,4 +1,5 @@
 // apps/flutter/lib/screens/new_access_request_screen.dart
+import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import '../services/api_service.dart';
@@ -34,7 +35,7 @@ class _NewAccessRequestScreenState extends State<NewAccessRequestScreen> {
 
     try {
       final scope = Map<String, dynamic>.from(
-        Uri.decodeComponent(_scopeController.text) as Map,
+        jsonDecode(_scopeController.text) as Map,
       );
       
       await ApiService.createAccessRequest(
@@ -104,7 +105,7 @@ class _NewAccessRequestScreenState extends State<NewAccessRequestScreen> {
                     return 'Please enter access scope';
                   }
                   try {
-                    Map<String, dynamic>.from(Uri.decodeComponent(value) as Map);
+                    Map<String, dynamic>.from(jsonDecode(value) as Map);
                     return null;
                   } catch (e) {
                     return 'Invalid JSON format';
