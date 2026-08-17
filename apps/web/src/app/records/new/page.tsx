@@ -21,6 +21,7 @@ export default function NewRecordPage() {
   const [date, setDate] = useState("");
   const [doctorName, setDoctorName] = useState("");
   const [hospitalName, setHospitalName] = useState("");
+  const [details, setDetails] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,12 +32,15 @@ export default function NewRecordPage() {
     setLoading(true);
 
     try {
+      const detailsObj = details.trim() ? { notes: details.trim() } : undefined;
+
       if (file) {
         const formData = new FormData();
         formData.append("type", type);
         formData.append("date", date);
         if (doctorName) formData.append("doctorName", doctorName);
         if (hospitalName) formData.append("hospitalName", hospitalName);
+        if (detailsObj) formData.append("details", JSON.stringify(detailsObj));
         formData.append("file", file);
 
         const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -53,7 +57,7 @@ export default function NewRecordPage() {
       } else {
         await apiFetch<{ record: MedicalRecord }>("/api/records", {
           method: "POST",
-          body: JSON.stringify({ type, date, doctorName, hospitalName }),
+          body: JSON.stringify({ type, date, doctorName, hospitalName, details: detailsObj }),
         });
       }
 
@@ -134,6 +138,20 @@ export default function NewRecordPage() {
               type="text"
               value={hospitalName}
               onChange={(e) => setHospitalName(e.target.value)}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="details" className="mb-1 block text-sm font-medium text-gray-700">
+              Details / Notes <span className="font-normal text-gray-400"></span>
+            </label>
+            <textarea
+              id="details"
+              rows={6}
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              placeholder="Add any additional information about this record..."
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>

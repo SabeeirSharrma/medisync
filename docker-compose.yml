@@ -147,6 +147,35 @@ services:
       - tools
     restart: unless-stopped
 
+  # Optional: Cloudflare Tunnel — expose services without opening ports
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on:
+      api:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    profiles:
+      - tunnel
+    restart: unless-stopped
+
+  # Optional: ngrok — quick dev tunnel for testing webhooks/sharing
+  ngrok:
+    image: ngrok/ngrok:latest
+    command: start --config /etc/ngrok.yml
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN:-}
+    volumes:
+      - ./config/ngrok.yml:/etc/ngrok.yml:ro
+    ports:
+      - "4040:4040"
+    profiles:
+      - tunnel
+    restart: unless-stopped
+
   # Optional: PostgreSQL backup service
   backup:
     image: prodrigestivill/postgres-backup-local:latest

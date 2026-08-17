@@ -1,0 +1,10 @@
+version: "2"
+tunnels:
+  medisync-web:
+    addr: web:3000
+    proto: http
+    inspect: true
+  medisync-api:
+    addr: api:3001
+    proto: http
+    inspect: true

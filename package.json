@@ -10,6 +10,9 @@
     "db:migrate": "bun run --filter @medisync/api db:migrate",
     "db:push": "bun run --filter @medisync/api db:push",
     "build": "bun run --filter '*' build",
-    "typecheck": "bun run --filter '*' typecheck"
+    "typecheck": "bun run --filter '*' typecheck",
+    "tunnel:web": "cloudflared tunnel --url http://localhost:3000",
+    "tunnel:api": "cloudflared tunnel --url http://localhost:3001",
+    "tunnel:ngrok": "ngrok http 3000"
   }
 }

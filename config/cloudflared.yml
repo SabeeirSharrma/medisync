@@ -1,0 +1,8 @@
+tunnel: <TUNNEL_ID>
+credentials-file: /etc/cloudflared/credentials.json
+ingress:
+  - hostname: medisync.your-domain.com
+    service: http://web:3000
+  - hostname: api.medisync.your-domain.com
+    service: http://api:3001
+  - service: http_status:404

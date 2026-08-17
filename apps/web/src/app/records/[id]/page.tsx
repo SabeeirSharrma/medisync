@@ -126,9 +126,20 @@ export default function RecordDetailPage() {
         {record.details && Object.keys(record.details).length > 0 && (
           <div className="mt-6 rounded-lg border border-gray-200 bg-white p-4">
             <h3 className="text-xs font-medium uppercase text-gray-500">Additional info</h3>
-            <pre className="mt-3 whitespace-pre-wrap text-sm text-gray-700">
-              {JSON.stringify(record.details, null, 2)}
-            </pre>
+            <dl className="mt-3 space-y-3 text-sm">
+              {Object.entries(record.details).map(([key, value]) => (
+                <div key={key}>
+                  <dt className="font-medium text-gray-700 capitalize">
+                    {key.replace(/_/g, " ")}
+                  </dt>
+                  <dd className="mt-1 text-gray-600">
+                    {typeof value === "object"
+                      ? JSON.stringify(value, null, 2)
+                      : String(value ?? "—")}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
         )}
       </main>

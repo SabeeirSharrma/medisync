@@ -66,6 +66,7 @@ medisync/
 - [API Reference](docs/api.md) — endpoint documentation
 - [Development Setup](docs/setup.md) — local development guide
 - [Deployment](DEPLOY.md) — production deployment guide
+- [Tunneling](docs/tunneling.md) — Cloudflare Tunnel, SSH, ngrok setup
 
 ## License
 

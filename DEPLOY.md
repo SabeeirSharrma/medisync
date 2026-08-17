@@ -221,3 +221,17 @@ docker compose up -d
 - Database issues: `docker compose exec postgres psql -U medisync -d medisync`
 - API issues: `docker compose logs -f api`
 - MinIO console: http://localhost:9001 (dev) or https://minio.your-domain.com (prod)
+
+## Tunneling & Remote Access
+
+For exposing your instance without opening ports, see [docs/tunneling.md](docs/tunneling.md).
+
+**Quick options:**
+
+```bash
+# Cloudflare Tunnel (production)
+CLOUDFLARE_TUNNEL_TOKEN=<token> docker compose --profile tunnel up -d cloudflared
+
+# ngrok (dev/testing)
+NGROK_AUTHTOKEN=<token> docker compose --profile tunnel up -d ngrok
+```
