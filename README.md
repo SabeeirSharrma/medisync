@@ -28,7 +28,7 @@ Patient-controlled electronic health records (EHR) system. Patients own their me
 ## Quick Start
 
 ```bash
-git clone <repo-url> && cd medisync
+git clone https://github.com/SabeeirSharrma/medisync.git && cd medisync
 cp .env.example .env
 docker compose up -d
 ```

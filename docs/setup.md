@@ -10,7 +10,7 @@
 
 ```bash
 # 1. Clone and install dependencies
-git clone <repo-url> && cd medisync
+git clone https://github.com/SabeeirSharrma/medisync.git && cd medisync
 bun install
 
 # 2. Start infrastructure (Postgres + MinIO)

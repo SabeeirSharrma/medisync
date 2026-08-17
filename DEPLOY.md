@@ -4,7 +4,7 @@
 
 ```bash
 # 1. Clone and setup
-git clone <repo-url>
+git clone https://github.com/SabeeirSharrma/medisync.git
 cd medisync
 
 # 2. Configure environment
