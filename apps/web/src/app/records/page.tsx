@@ -36,12 +36,10 @@ export default function RecordsPage() {
     apiFetch<{ user: User }>("/api/auth/me")
       .then((res) => {
         setUser(res.user);
-        return apiFetch<PaginatedRecords>(`/api/records?page=${page}&limit=10`);
       })
-      .then((res) => setData(res))
       .catch(() => router.push("/login"))
       .finally(() => setLoading(false));
-  }, [router, page]);
+  }, [router]);
 
   useEffect(() => {
     if (user) {

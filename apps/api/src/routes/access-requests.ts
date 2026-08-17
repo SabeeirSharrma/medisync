@@ -269,30 +269,42 @@ export default async function accessRequestRoutes(app: FastifyInstance) {
     },
   );
 
-  // PATCH /api/access-requests/:id/revoke — patient revokes approved access
+  // PATCH /api/access-requests/:id/revoke — patient revokes approved access, or doctor revokes their own
   app.patch(
     "/access-requests/:id/revoke",
     { preHandler: requireAuth },
     async (request, reply) => {
       const user = request.user!;
-      if (user.role !== "patient") {
-        return reply
-          .code(403)
-          .send({ error: "Only patients can revoke access" });
-      }
 
       const { id } = request.params as { id: string };
 
-      const [existing] = await db
-        .select()
-        .from(accessRequests)
-        .where(
-          and(
-            eq(accessRequests.id, id),
-            eq(accessRequests.patientId, user.id),
-          ),
-        )
-        .limit(1);
+      // Find the access request — patient can revoke their own, doctor can revoke ones they sent
+      let existing;
+      if (user.role === "patient") {
+        [existing] = await db
+          .select()
+          .from(accessRequests)
+          .where(
+            and(
+              eq(accessRequests.id, id),
+              eq(accessRequests.patientId, user.id),
+            ),
+          )
+          .limit(1);
+      } else if (user.role === "doctor") {
+        [existing] = await db
+          .select()
+          .from(accessRequests)
+          .where(
+            and(
+              eq(accessRequests.id, id),
+              eq(accessRequests.doctorId, user.id),
+            ),
+          )
+          .limit(1);
+      } else {
+        return reply.code(403).send({ error: "Not authorized to revoke" });
+      }
 
       if (!existing) {
         return reply.code(404).send({ error: "Access request not found" });

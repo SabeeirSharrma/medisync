@@ -217,7 +217,7 @@ export default function AccessRequestsPage() {
                     >
                       {req.status}
                     </span>
-                    {isDoctor && req.status === "approved" && (
+                    {(isDoctor || !isDoctor) && req.status === "approved" && (
                       <button
                         onClick={() => handleRevoke(req.id)}
                         disabled={actionLoading === req.id}

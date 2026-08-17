@@ -183,7 +183,7 @@ export default function GuardianPage() {
                   id="trigger-type"
                   value={newForm.triggerType}
                   onChange={(e) => setNewForm({ ...newForm, triggerType: e.target.value as GuardianTriggerType })}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline:none focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 >
                   {TRIGGER_TYPES.map((t) => (
                     <option key={t} value={t}>

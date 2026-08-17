@@ -60,8 +60,8 @@ services:
   # API service - runs migrations and starts Fastify server
   api:
     build:
-      context: ./apps/api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/api/Dockerfile
     ports:
       - "3001:3001"
     environment:
@@ -82,11 +82,11 @@ services:
       minio:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001/api/health"]
+      test: ["CMD", "bun", "-e", "fetch('http://localhost:3001/api/health').then(r=>{if(!r.ok)throw 1})"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 45s
     deploy:
       resources:
         limits:
@@ -100,18 +100,21 @@ services:
   # Web service - Next.js frontend
   web:
     build:
-      context: ./apps/web
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/web/Dockerfile
     ports:
       - "3000:3000"
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      # Next.js standalone server binds to $HOSTNAME; Docker auto-sets it to the
+      # container ID, so force 0.0.0.0 to keep localhost reachable in-container
+      HOSTNAME: "0.0.0.0"
       NODE_ENV: ${NODE_ENV:-production}
     depends_on:
       api:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
+      test: ["CMD", "bun", "-e", "fetch('http://localhost:3000').then(r=>{if(!r.ok)throw 1})"]
       interval: 30s
       timeout: 10s
       retries: 3

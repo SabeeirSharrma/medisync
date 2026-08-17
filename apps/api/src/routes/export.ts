@@ -129,12 +129,13 @@ export default async function exportRoutes(app: FastifyInstance) {
       dateTo: query.dateTo,
     });
 
+    const patientIds = [...new Set(rows.map((r) => r.patientId))];
     await logAudit({
       actorId: user.id,
       actorRoleAtTime: user.role,
       actionType: "record.read",
-      targetPatientId: user.id,
-      details: { export: "csv", count: rows.length },
+      targetPatientId: patientIds.length === 1 ? patientIds[0] : null,
+      details: { export: "csv", count: rows.length, patientIds },
     });
 
     const csv = recordsToCsv(rows);
@@ -155,21 +156,27 @@ export default async function exportRoutes(app: FastifyInstance) {
       dateTo: query.dateTo,
     });
 
+    const patientIds = [...new Set(rows.map((r) => r.patientId))];
     await logAudit({
       actorId: user.id,
       actorRoleAtTime: user.role,
       actionType: "record.read",
-      targetPatientId: user.id,
-      details: { export: "pdf", count: rows.length },
+      targetPatientId: patientIds.length === 1 ? patientIds[0] : null,
+      details: { export: "pdf", count: rows.length, patientIds },
     });
 
     const html = buildPdfHtml(user, rows);
 
-    const puppeteer = await import("puppeteer");
-    const browser = await puppeteer.default.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    let browser;
+    try {
+      const puppeteer = await import("puppeteer");
+      browser = await puppeteer.default.launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      });
+    } catch (err) {
+      return reply.code(500).send({ error: "PDF generation unavailable: Chromium not installed" });
+    }
 
     try {
       const page = await browser.newPage();

@@ -24,9 +24,10 @@ export default function RecordDetailPage() {
             `/api/records/${id}/attachment`,
           );
         }
+        return null;
       })
       .then((res) => {
-        if (res) setAttachmentUrl(res.url);
+        if (res && res.url) setAttachmentUrl(res.url);
       })
       .catch(() => router.push("/records"))
       .finally(() => setLoading(false));
