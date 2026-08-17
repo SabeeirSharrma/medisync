@@ -19,7 +19,8 @@ export async function buildApp() {
 
   await app.register(cookie);
   await app.register(cors, {
-    origin: config.corsOrigin,
+    origin: config.corsOrigin as string[],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
   });
   await app.register(multipart, { limits: { fileSize: 50 * 1024 * 1024 } });
