@@ -1,0 +1,1 @@
+globalThis.__RSC_MANIFEST=(globalThis.__RSC_MANIFEST||{});globalThis.__RSC_MANIFEST["/api/diagnose/route"]={"moduleLoading":{"prefix":"/_next/"},"ssrModuleMapping":{},"edgeSSRModuleMapping":{},"clientModules":{},"entryCSSFiles":{"C:\\Users\\LENOVO\\Desktop\\merged-health-app\\app\\api\\diagnose\\route":[]},"rscModuleMapping":{},"edgeRscModuleMapping":{}};

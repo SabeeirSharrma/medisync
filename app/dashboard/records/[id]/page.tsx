@@ -1,0 +1,158 @@
+'use client'
+
+import { useEffect, useState, useMemo } from 'react'
+import { useRouter, useParams } from 'next/navigation'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { MedicalRecord } from '@/types'
+
+export default function RecordDetailPage() {
+  const router = useRouter()
+  const params = useParams()
+  const id = params.id as string
+  const [record, setRecord] = useState<MedicalRecord | null>(null)
+  const [loading, setLoading] = useState(true)
+  const supabase = useMemo(() => createClient(), [])
+
+  useEffect(() => {
+    const fetchRecord = async () => {
+      try {
+        const { data } = await supabase.from('records').select('*').eq('id', id).single()
+        if (data) setRecord(data)
+        else router.push('/dashboard/records')
+      } catch { router.push('/dashboard/records') }
+      setLoading(false)
+    }
+    fetchRecord()
+  }, [id, supabase, router])
+
+  const handleDelete = async () => {
+    if (!confirm('Delete this record?')) return
+
+    // Delete attachment from storage if exists
+    if (record?.attachment_url) {
+      const url = new URL(record.attachment_url)
+      const path = url.pathname.split('/record-attachments/')[1]
+      if (path) {
+        await supabase.storage.from('record-attachments').remove([path])
+      }
+    }
+
+    await supabase.from('records').delete().eq('id', id)
+    router.push('/dashboard/records')
+  }
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><LoadingSpinner size="lg" text="Loading record..." /></div>
+  if (!record) return null
+
+  return (
+    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '32px' }} className="animate-fade-in">
+        <Link href="/dashboard/records" className="inline-flex items-center gap-1" style={{ fontSize: '14px', color: 'var(--color-primary)', textDecoration: 'none', marginBottom: '16px', fontWeight: 500 }}>
+          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_back</span> Back to Records
+        </Link>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px', textTransform: 'capitalize' }}>{record.type.replace('_', ' ')}</h1>
+            <p style={{ fontSize: '15px', color: 'var(--color-on-surface-variant)' }}>{record.date}</p>
+          </div>
+          <button onClick={handleDelete} className="btn-danger" style={{ padding: '10px 20px', fontSize: '13px' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>delete</span> Delete
+          </button>
+        </div>
+      </div>
+
+      {/* Prescription Photo */}
+      {record.attachment_url && (
+        <div className="glass-card animate-fade-in" style={{ padding: '24px', marginBottom: '24px' }}>
+          <div className="flex items-center gap-2" style={{ marginBottom: '16px' }}>
+            <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)', fontSize: '22px' }}>photo</span>
+            <h2 style={{ fontSize: '18px', fontWeight: 600 }}>
+              {record.content_type?.startsWith('image/') ? 'Prescription Photo' : 'Attached Document'}
+            </h2>
+          </div>
+
+          {record.content_type?.startsWith('image/') ? (
+            <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--color-outline-variant)' }}>
+              <img
+                src={record.attachment_url}
+                alt="Prescription"
+                style={{ width: '100%', maxHeight: '600px', objectFit: 'contain', background: 'white', cursor: 'zoom-in' }}
+                onClick={() => window.open(record.attachment_url!, '_blank')}
+              />
+            </div>
+          ) : (
+            <a
+              href={record.attachment_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="glass-card"
+              style={{
+                padding: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
+                textDecoration: 'none',
+                color: 'inherit',
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--color-primary)' }}>description</span>
+              <div>
+                <p style={{ fontWeight: 600 }}>View Document</p>
+                <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)' }}>Click to open in new tab</p>
+              </div>
+            </a>
+          )}
+
+          <p style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)', marginTop: '12px' }}>
+            {record.file_size ? `File size: ${(record.file_size / 1024).toFixed(1)} KB` : ''}
+            {record.content_type ? ` • Type: ${record.content_type}` : ''}
+          </p>
+        </div>
+      )}
+
+      {/* Record Details */}
+      <div style={{ display: 'grid', gridTemplateColumns: record.attachment_url ? '1fr' : '1fr 1fr', gap: '20px' }} className="animate-fade-in">
+        <div className="glass-card" style={{ padding: '24px' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-on-surface-variant)', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Details</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <p style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)', marginBottom: '4px' }}>Doctor</p>
+              <p style={{ fontSize: '15px', fontWeight: 600 }}>{record.doctor_name || '—'}</p>
+            </div>
+            <div>
+              <p style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)', marginBottom: '4px' }}>Hospital</p>
+              <p style={{ fontSize: '15px', fontWeight: 600 }}>{record.hospital_name || '—'}</p>
+            </div>
+            <div>
+              <p style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)', marginBottom: '4px' }}>Record Type</p>
+              <p style={{ fontSize: '15px', fontWeight: 600, textTransform: 'capitalize' }}>{record.type.replace('_', ' ')}</p>
+            </div>
+          </div>
+        </div>
+
+        {record.details && Object.keys(record.details).length > 0 && (
+          <div className="glass-card" style={{ padding: '24px' }}>
+            <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-on-surface-variant)', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Additional Info</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {Object.entries(record.details).map(([key, value]) => (
+                <div key={key}>
+                  <p style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)', textTransform: 'capitalize', marginBottom: '4px' }}>{key.replace(/_/g, ' ')}</p>
+                  <p style={{ fontSize: '15px' }}>{typeof value === 'object' ? JSON.stringify(value) : String(value)}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {!record.attachment_url && (
+        <div className="glass-card animate-fade-in" style={{ padding: '32px', marginTop: '20px', textAlign: 'center' }}>
+          <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--color-outline-variant)', marginBottom: '12px', display: 'block' }}>photo_camera</span>
+          <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)' }}>No photo attached to this record</p>
+        </div>
+      )}
+    </div>
+  )
+}

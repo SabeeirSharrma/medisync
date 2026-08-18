@@ -1,0 +1,47 @@
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export async function updateSession(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({
+    request,
+  })
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  if (!url || !url.includes('.supabase.co')) {
+    return supabaseResponse
+  }
+
+  try {
+    const supabase = createServerClient(
+      url,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) =>
+              request.cookies.set(name, value)
+            )
+            supabaseResponse = NextResponse.next({
+              request,
+            })
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options)
+            )
+          },
+        },
+      }
+    )
+
+    await Promise.race([
+      supabase.auth.getUser(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 800)),
+    ])
+  } catch {
+    // Supabase unreachable or timed out - continue
+  }
+
+  return supabaseResponse
+}
