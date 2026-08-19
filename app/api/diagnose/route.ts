@@ -81,7 +81,9 @@ export async function POST(request: NextRequest) {
           const diagnosis = aiData.response || aiData.diagnosis || aiData.output || aiData.choices?.[0]?.message?.content || JSON.stringify(aiData)
           return NextResponse.json({ diagnosis })
         }
-      } catch {}
+      } catch (err) {
+        console.error('AI call failed, using mock:', err)
+      }
     }
 
     const diagnosis = generateMockResponse(input)

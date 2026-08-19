@@ -26,7 +26,7 @@ export default function LoginPage() {
         router.push('/dashboard')
       }
     } catch {
-      router.push('/dashboard')
+      setError('Unable to connect to the authentication service.')
     } finally {
       setLoading(false)
     }

@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{ id: string; user_metadata?: Record<string, unknown> } | null>(null)
   const [mounted, setMounted] = useState(false)
   const [recordCount, setRecordCount] = useState(0)
   const supabase = useMemo(() => createClient(), [])
@@ -18,7 +18,9 @@ export default function DashboardPage() {
         setUser(user)
         const { count } = await supabase.from('records').select('*', { count: 'exact', head: true }).eq('patient_id', user?.id || '')
         setRecordCount(count || 0)
-      } catch {}
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err)
+      }
     }
     getData()
   }, [supabase])
@@ -34,7 +36,7 @@ export default function DashboardPage() {
     <div className={`${mounted ? 'animate-fade-in' : 'opacity-0'}`} style={{ maxWidth: '1100px', margin: '0 auto' }}>
       <div style={{ marginBottom: '40px' }}>
         <h1 style={{ fontSize: '36px', fontWeight: 700, marginBottom: '8px' }}>
-          {getGreeting()}, <span style={{ color: 'var(--color-primary)' }}>{user?.user_metadata?.username || 'there'}</span>
+          {getGreeting()}, <span style={{ color: 'var(--color-primary)' }}>{String(user?.user_metadata?.username || 'there')}</span>
         </h1>
         <p style={{ fontSize: '16px', color: 'var(--color-on-surface-variant)' }}>
           Manage your health with AI-powered insights and secure record keeping.

@@ -24,7 +24,7 @@ function formatReason(code: string) {
 
 export default function EmergencyAccessPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{ id: string; user_metadata?: Record<string, unknown> } | null>(null)
   const [accesses, setAccesses] = useState<EmergencyAccessWithUser[]>([])
   const [loading, setLoading] = useState(true)
   const [showNew, setShowNew] = useState(false)
@@ -43,7 +43,9 @@ export default function EmergencyAccessPage() {
         setUser(authUser)
         const { data } = await supabase.from('emergency_access').select('*').or(`doctor_id.eq.${authUser.id},patient_id.eq.${authUser.id}`)
         if (data) setAccesses(data)
-      } catch {}
+      } catch (err) {
+        console.error('Failed to fetch emergency access:', err)
+      }
       setLoading(false)
     }
     fetchData()

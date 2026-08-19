@@ -39,8 +39,8 @@ export async function updateSession(request: NextRequest) {
       supabase.auth.getUser(),
       new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 800)),
     ])
-  } catch {
-    // Supabase unreachable or timed out - continue
+  } catch (err) {
+    console.error('Supabase session refresh failed:', err)
   }
 
   return supabaseResponse

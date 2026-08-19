@@ -15,7 +15,7 @@ const TRIGGER_TYPES: { value: GuardianTriggerType; label: string; icon: string }
 
 export default function GuardianPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{ id: string; user_metadata?: Record<string, unknown> } | null>(null)
   const [links, setLinks] = useState<GuardianLinkWithUser[]>([])
   const [loading, setLoading] = useState(true)
   const [showNew, setShowNew] = useState(false)
@@ -34,7 +34,9 @@ export default function GuardianPage() {
         setUser(authUser)
         const { data } = await supabase.from('guardian_links').select('*').or(`patient_id.eq.${authUser.id},guardian_id.eq.${authUser.id}`)
         if (data) setLinks(data)
-      } catch {}
+      } catch (err) {
+        console.error('Failed to fetch guardian links:', err)
+      }
       setLoading(false)
     }
     fetchData()

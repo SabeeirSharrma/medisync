@@ -7,8 +7,8 @@ import { createClient } from '@/lib/supabase/client'
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const [user, setUser] = useState<any>(null)
-  const [profile, setProfile] = useState<any>(null)
+  const [user, setUser] = useState<{ id: string; email?: string; user_metadata?: Record<string, unknown> } | null>(null)
+  const [profile, setProfile] = useState<{ username?: string | null; role?: string | null } | null>(null)
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const supabase = useMemo(() => createClient(), [])
@@ -27,11 +27,13 @@ export default function Sidebar() {
             .single()
           setProfile(profileData)
         }
-      } catch {}
+      } catch (err) {
+        console.error('Failed to load user profile:', err)
+      }
     }
     getUser()
 
-    let subscription: any = null
+    let subscription: { unsubscribe: () => void } | null = null
     try {
       const { data } = supabase.auth.onAuthStateChange(async (_event, session) => {
         setUser(session?.user ?? null)
@@ -45,7 +47,9 @@ export default function Sidebar() {
         }
       })
       subscription = data.subscription
-    } catch {}
+    } catch (err) {
+      console.error('Auth state listener error:', err)
+    }
 
     return () => { subscription?.unsubscribe() }
   }, [supabase])
@@ -61,8 +65,10 @@ export default function Sidebar() {
   }, [])
 
   const handleLogout = async () => {
-    try { await supabase.auth.signOut() } catch {}
-    window.location.href = '/register'
+    try { await supabase.auth.signOut() } catch (err) {
+      console.error('Logout error:', err)
+    }
+    window.location.href = '/login'
   }
 
   // Get display name: prefer username from profiles, then metadata, then email prefix

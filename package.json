@@ -1,32 +1,18 @@
 {
-  "name": "medisync-health",
-  "version": "1.0.0",
+  "name": "medisync",
   "private": true,
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "next dev --webpack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "next": "16.2.12",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "@supabase/ssr": "^0.12.3",
-    "@supabase/supabase-js": "^2.110.8",
-    "framer-motion": "^12.42.2",
-    "lucide-react": "^1.27.0",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^3.3.0"
+    "dev:api": "bun run --filter @medisync/api dev",
+    "dev:web": "bun run --filter @medisync/web dev",
+    "dev": "bun run --filter '*' dev",
+    "db:generate": "bun run --filter @medisync/api db:generate",
+    "db:migrate": "bun run --filter @medisync/api db:migrate",
+    "db:push": "bun run --filter @medisync/api db:push",
+    "build": "bun run --filter '*' build",
+    "typecheck": "bun run --filter '*' typecheck"
   },
   "devDependencies": {
-    "tailwindcss": "^4",
-    "@tailwindcss/postcss": "^4",
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.12"
+    "@tailwindcss/postcss": "^4.3.3"
   }
 }

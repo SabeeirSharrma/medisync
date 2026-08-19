@@ -54,7 +54,9 @@ export default function DiagnosePage() {
       try {
         const { data: { user: authUser } } = await supabase.auth.getUser()
         if (authUser) userId = authUser.id
-      } catch {}
+        } catch (err) {
+          console.error('Failed to save diagnosis:', err)
+        }
 
       const response = await fetch('/api/diagnose', {
         method: 'POST',
@@ -79,7 +81,9 @@ export default function DiagnosePage() {
             .single()
 
           if (saved) { router.push(`/dashboard/results/${saved.id}`); return }
-        } catch {}
+      } catch (err) {
+        console.error('Failed to get user:', err)
+      }
         alert('Diagnosis complete!\n\n' + data.diagnosis)
       }
     } catch (error) {

@@ -62,7 +62,10 @@ export default function ResultsPage() {
         setDiagnosis(data)
         const parsed = parseAIResponse(data.ai_response || '')
         setCards(shuffleArray(parsed))
-      } catch { router.push('/dashboard') }
+      } catch (err) {
+        console.error('Failed to fetch diagnosis:', err)
+        router.push('/dashboard')
+      }
       setLoading(false)
     }
     fetchDiagnosis()

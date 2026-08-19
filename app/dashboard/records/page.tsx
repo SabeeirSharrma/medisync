@@ -21,7 +21,9 @@ export default function RecordsPage() {
         if (!user) { router.push('/login'); return }
         const { data } = await supabase.from('records').select('*').eq('patient_id', user.id).order('date', { ascending: false })
         if (data) setRecords(data)
-      } catch {}
+      } catch (err) {
+        console.error('Failed to fetch records:', err)
+      }
       setLoading(false)
     }
     fetchRecords()

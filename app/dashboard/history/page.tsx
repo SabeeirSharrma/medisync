@@ -20,7 +20,9 @@ export default function HistoryPage() {
       try {
         const { data } = await supabase.from('diagnoses').select('*').order('created_at', { ascending: false })
         if (data) setDiagnoses(data)
-      } catch {}
+      } catch (err) {
+        console.error('Failed to fetch diagnoses:', err)
+      }
       setLoading(false)
     }
     fetchDiagnoses()

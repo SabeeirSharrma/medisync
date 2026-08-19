@@ -10,7 +10,7 @@ import { AccessRequestWithUser } from '@/types'
 
 export default function AccessRequestsPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{ id: string; user_metadata?: Record<string, unknown> } | null>(null)
   const [requests, setRequests] = useState<AccessRequestWithUser[]>([])
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
@@ -25,7 +25,9 @@ export default function AccessRequestsPage() {
         // Fetch access requests where user is doctor or patient
         const { data } = await supabase.from('access_requests').select('*').or(`doctor_id.eq.${authUser.id},patient_id.eq.${authUser.id}`)
         if (data) setRequests(data)
-      } catch {}
+      } catch (err) {
+        console.error('Failed to fetch access requests:', err)
+      }
       setLoading(false)
     }
     fetchData()
