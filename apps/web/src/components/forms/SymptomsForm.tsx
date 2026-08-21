@@ -1,5 +1,6 @@
 'use client'
 
+import { ClipboardList } from 'lucide-react'
 import TagInput from '@/components/ui/TagInput'
 
 interface SymptomsFormProps {
@@ -42,7 +43,7 @@ export default function SymptomsForm({
   return (
     <div>
       <div className="section-title" style={{ marginBottom: '24px' }}>
-        <span className="material-symbols-outlined" style={{ color: 'var(--color-tertiary)', fontSize: '22px' }}>clinical_notes</span>
+        <ClipboardList style={{ color: 'var(--color-tertiary)', fontSize: '22px' }} />
         Describe Your Symptoms
       </div>
 

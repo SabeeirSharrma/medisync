@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { api } from '@/lib/api'
+import { Heart, PlusCircle, FolderOpen, Route, ClipboardList, FilePlus, Shield, Siren } from 'lucide-react'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null)
@@ -29,6 +30,10 @@ export default function DashboardPage() {
     return 'Good evening'
   }
 
+  const iconMap: Record<string, React.ComponentType<any>> = {
+    clinical_notes: ClipboardList, add_note: FilePlus, shield: Shield, emergency: Siren,
+  }
+
   return (
     <div className={`${mounted ? 'animate-fade-in' : 'opacity-0'}`} style={{ maxWidth: '1100px', margin: '0 auto' }}>
       <div style={{ marginBottom: '40px' }}>
@@ -43,7 +48,7 @@ export default function DashboardPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '32px' }}>
         <div className="glass-card" style={{ padding: '32px' }}>
           <div className="flex items-center gap-2" style={{ marginBottom: '20px' }}>
-            <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)', fontSize: '22px' }}>favorite</span>
+            <Heart size={22} style={{ color: 'var(--color-primary)' }} />
             <span style={{ fontWeight: 600, fontSize: '15px' }}>Wellness Score</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
@@ -68,7 +73,7 @@ export default function DashboardPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <Link href="/dashboard/diagnose" className="glass-card" style={{ padding: '24px', textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'var(--color-primary-container)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)', fontSize: '24px' }}>add_circle</span>
+              <PlusCircle size={24} style={{ color: 'var(--color-primary)' }} />
             </div>
             <div>
               <div style={{ fontWeight: 600, fontSize: '15px', marginBottom: '4px' }}>New Diagnosis</div>
@@ -77,7 +82,7 @@ export default function DashboardPage() {
           </Link>
           <Link href="/dashboard/records" className="glass-card" style={{ padding: '24px', textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'var(--color-tertiary-container)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span className="material-symbols-outlined" style={{ color: 'var(--color-tertiary)', fontSize: '24px' }}>folder_open</span>
+              <FolderOpen size={24} style={{ color: 'var(--color-tertiary)' }} />
             </div>
             <div>
               <div style={{ fontWeight: 600, fontSize: '15px', marginBottom: '4px' }}>Medical Records</div>
@@ -89,7 +94,7 @@ export default function DashboardPage() {
 
       <div className="glass-card" style={{ padding: '32px', marginBottom: '32px' }}>
         <div className="section-title">
-          <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)', fontSize: '22px' }}>route</span>
+          <Route size={22} style={{ color: 'var(--color-primary)' }} />
           Quick Actions
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
@@ -101,7 +106,7 @@ export default function DashboardPage() {
           ].map((item) => (
             <Link key={item.href} href={item.href} style={{ textDecoration: 'none', color: 'inherit' }}>
               <div style={{ padding: '20px', borderRadius: '16px', border: '1px solid var(--color-outline-variant)', background: 'white', textAlign: 'center', transition: 'all 0.2s ease' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '28px', color: `var(--color-${item.color})`, marginBottom: '8px', display: 'block' }}>{item.icon}</span>
+                {(() => { const Icon = iconMap[item.icon]; return Icon ? <Icon size={28} style={{ color: `var(--color-${item.color})`, marginBottom: '8px', display: 'block' }} /> : null; })()}
                 <span style={{ fontSize: '13px', fontWeight: 600 }}>{item.label}</span>
               </div>
             </Link>

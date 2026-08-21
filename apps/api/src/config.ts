@@ -14,4 +14,8 @@ export const config = {
   s3Region: process.env.S3_REGION || "us-east-1",
   openaiApiKey: process.env.OPENAI_API_KEY,
   openaiModel: process.env.OPENAI_MODEL || "gpt-4o-mini",
+  resendApiKey: process.env.RESEND_API_KEY,
+  resendFromEmail: process.env.RESEND_FROM_EMAIL || "MediSync <noreply@medisync.local>",
+  emailVerificationEnabled: process.env.EMAIL_VERIFICATION_ENABLED === "true",
+  verificationTokenExpiryMinutes: parseInt(process.env.VERIFICATION_TOKEN_EXPIRY_MINUTES || "60", 10),
 };

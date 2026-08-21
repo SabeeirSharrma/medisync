@@ -68,13 +68,17 @@ services:
       S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-medisync_dev}
       S3_BUCKET: medisync
       S3_REGION: us-east-1
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-MediSync <noreply@medisync.local>}
+      EMAIL_VERIFICATION_ENABLED: ${EMAIL_VERIFICATION_ENABLED:-false}
+      VERIFICATION_TOKEN_EXPIRY_MINUTES: ${VERIFICATION_TOKEN_EXPIRY_MINUTES:-60}
     depends_on:
       postgres:
         condition: service_healthy
       minio:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "bun", "-e", "fetch('http://localhost:3001/api/health').then(r=>{if(!r.ok)throw 1})"]
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3001/api/health').then(r=>{if(!r.ok)throw 1})"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -102,7 +106,7 @@ services:
       api:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "bun", "-e", "fetch('http://localhost:3000').then(r=>{if(!r.ok)throw 1})"]
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000').then(r=>{if(!r.ok)throw 1})"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { api } from '@/lib/api'
+import { ArrowLeft, FilePlus } from 'lucide-react'
 
 const RECORD_TYPES = ['prescription', 'lab_result', 'checkup', 'surgery', 'imaging', 'other'] as const
 
@@ -39,10 +40,10 @@ export default function NewRecordPage() {
     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
       <div style={{ marginBottom: '32px' }} className="animate-fade-in">
         <Link href="/dashboard/records" className="inline-flex items-center gap-1" style={{ fontSize: '14px', color: 'var(--color-primary)', textDecoration: 'none', marginBottom: '16px', fontWeight: 500 }}>
-          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_back</span> Back to Records
+          <ArrowLeft size={18} /> Back to Records
         </Link>
         <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
-          <span className="material-symbols-outlined" style={{ verticalAlign: 'middle', marginRight: '8px', color: 'var(--color-primary)' }}>add_note</span>
+          <FilePlus size={22} style={{ verticalAlign: 'middle', marginRight: '8px', color: 'var(--color-primary)' }} />
           Add Medical Record
         </h1>
       </div>

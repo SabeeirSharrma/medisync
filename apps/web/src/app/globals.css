@@ -262,7 +262,7 @@ body {
   color: white;
 }
 
-.sidebar-link .material-symbols-outlined {
+.sidebar-link svg {
   font-size: 24px;
   flex-shrink: 0;
   width: 24px;
@@ -272,12 +272,12 @@ body {
   justify-content: center;
 }
 
-.sidebar-link span:not(.material-symbols-outlined) {
+.sidebar-link span:not(svg) {
   opacity: 0;
   transition: opacity 0.2s ease;
 }
 
-.sidebar:hover .sidebar-link span:not(.material-symbols-outlined) {
+.sidebar:hover .sidebar-link span:not(svg) {
   opacity: 1;
 }
 

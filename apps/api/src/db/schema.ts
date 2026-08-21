@@ -3,7 +3,7 @@ import { pgTable, text, uuid, timestamp, jsonb, integer, date, numeric } from "d
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").unique().notNull(),
-  username: text("username"),
+  username: text("username").unique(),
   passwordHash: text("password_hash").notNull(),
   role: text("role").default("patient"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
@@ -93,4 +93,28 @@ export const auditLog = pgTable("audit_log", {
   recordId: uuid("record_id"),
   timestamp: timestamp("timestamp", { withTimezone: true }).defaultNow(),
   details: jsonb("details"),
+});
+
+/**
+ * Stores hashes of revoked session tokens.
+ * When a user logs out, the token hash is inserted here.
+ * verifySession() checks this table before accepting a token.
+ */
+export const revokedTokens = pgTable("revoked_tokens", {
+  tokenHash: text("token_hash").primaryKey(),
+  revokedAt: timestamp("revoked_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+/**
+ * Stores email verification and password-reset tokens.
+ * Tokens are single-use and expire after a configurable period.
+ */
+export const verificationTokens = pgTable("verification_tokens", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull().unique(),
+  type: text("type").notNull(), // "email_verify" | "password_reset"
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  usedAt: timestamp("used_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });

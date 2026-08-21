@@ -3,14 +3,14 @@
   "private": true,
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev:api": "bun run --filter @medisync/api dev",
-    "dev:web": "bun run --filter @medisync/web dev",
-    "dev": "bun run --filter '*' dev",
-    "db:generate": "bun run --filter @medisync/api db:generate",
-    "db:migrate": "bun run --filter @medisync/api db:migrate",
-    "db:push": "bun run --filter @medisync/api db:push",
-    "build": "bun run --filter '*' build",
-    "typecheck": "bun run --filter '*' typecheck"
+    "dev:api": "npm run dev -w apps/api",
+    "dev:web": "npm run dev -w apps/web",
+    "dev": "npm run dev -w apps/api & npm run dev -w apps/web",
+    "db:generate": "npm run db:generate -w apps/api",
+    "db:migrate": "npm run db:migrate -w apps/api",
+    "db:push": "npm run db:push -w apps/api",
+    "build": "npm run build -w packages/shared && npm run build -w apps/api && npm run build -w apps/web",
+    "typecheck": "npm run typecheck -w packages/shared && npm run typecheck -w apps/api"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3"

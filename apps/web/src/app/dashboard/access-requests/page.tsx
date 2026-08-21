@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { api } from '@/lib/api'
+import { Shield, Plus } from 'lucide-react'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import EmptyState from '@/components/EmptyState'
 import type { AccessRequestWithUser } from '@medisync/shared'
@@ -60,14 +61,14 @@ export default function AccessRequestsPage() {
       <div className="flex justify-between items-center animate-fade-in" style={{ marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
-            <span className="material-symbols-outlined" style={{ verticalAlign: 'middle', marginRight: '8px', color: 'var(--color-primary)' }}>shield</span>
+            <Shield size={22} style={{ verticalAlign: 'middle', marginRight: '8px', color: 'var(--color-primary)' }} />
             Access Requests
           </h1>
           <p style={{ fontSize: '15px', color: 'var(--color-on-surface-variant)' }}>{requests.length} total requests</p>
         </div>
         {isDoctor && (
           <Link href="/dashboard/access-requests/new" className="btn-primary" style={{ padding: '12px 24px', fontSize: '14px' }}>
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span> Request Access
+            <Plus size={18} /> Request Access
           </Link>
         )}
       </div>

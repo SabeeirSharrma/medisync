@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
+import { Siren } from 'lucide-react'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import EmptyState from '@/components/EmptyState'
 import type { EmergencyAccess, EmergencyAccessReasonCode } from '@medisync/shared'
@@ -82,14 +83,14 @@ export default function EmergencyAccessPage() {
       <div className="flex justify-between items-center animate-fade-in" style={{ marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
-            <span className="material-symbols-outlined" style={{ verticalAlign: 'middle', marginRight: '8px', color: '#b71c1c' }}>emergency</span>
+            <Siren size={22} style={{ verticalAlign: 'middle', marginRight: '8px', color: '#b71c1c' }} />
             Emergency Access
           </h1>
           <p style={{ fontSize: '15px', color: 'var(--color-on-surface-variant)' }}>Break-glass access for critical situations (48-hour window)</p>
         </div>
         {isDoctor && (
           <button onClick={() => setShowNew(!showNew)} className="btn-danger" style={{ padding: '12px 24px', fontSize: '14px' }}>
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>emergency</span> Invoke Emergency
+            <Siren size={18} /> Invoke Emergency
           </button>
         )}
       </div>

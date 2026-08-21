@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { api } from '@/lib/api'
+import { HeartPulse, Plus } from 'lucide-react'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import EmptyState from '@/components/EmptyState'
 
@@ -39,13 +40,13 @@ export default function HistoryPage() {
       <div className="flex justify-between items-center animate-fade-in" style={{ marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
-            <span className="material-symbols-outlined" style={{ verticalAlign: 'middle', marginRight: '8px', color: 'var(--color-primary)' }}>monitor_heart</span>
+            <HeartPulse size={22} style={{ verticalAlign: 'middle', marginRight: '8px', color: 'var(--color-primary)' }} />
             Diagnosis History
           </h1>
           <p style={{ fontSize: '15px', color: 'var(--color-on-surface-variant)' }}>{diagnoses.length} {diagnoses.length === 1 ? 'diagnosis' : 'diagnoses'} recorded</p>
         </div>
         <Link href="/dashboard/diagnose" className="btn-primary" style={{ padding: '12px 24px', fontSize: '14px' }}>
-          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span> New Diagnosis
+          <Plus size={18} /> New Diagnosis
         </Link>
       </div>
 

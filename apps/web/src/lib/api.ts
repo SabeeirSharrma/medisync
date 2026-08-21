@@ -83,4 +83,21 @@ export const api = {
 
   updateGuardianLink: (id: string, status: string) =>
     request(`/api/guardian-links/${id}`, { method: "PATCH", body: JSON.stringify({ status }) }).then((d) => d.guardianLink),
+
+  // Email Verification
+  sendVerification: () =>
+    request("/api/auth/verify/send", { method: "POST" }),
+
+  confirmVerification: (token: string) =>
+    request("/api/auth/verify/confirm", { method: "POST", body: JSON.stringify({ token }) }),
+
+  getVerificationStatus: () =>
+    request("/api/auth/verify/status"),
+
+  // Password Reset
+  requestPasswordReset: (email: string) =>
+    request("/api/auth/password-reset/request", { method: "POST", body: JSON.stringify({ email }) }),
+
+  confirmPasswordReset: (token: string, password: string) =>
+    request("/api/auth/password-reset/confirm", { method: "POST", body: JSON.stringify({ token, password }) }),
 };

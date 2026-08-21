@@ -1,45 +1,44 @@
-FROM oven/bun:1.3 AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 # Copy everything first — .dockerignore excludes node_modules, .next, dist
-COPY package.json bun.lock tsconfig.base.json ./
+COPY package.json package-lock.json tsconfig.base.json ./
 COPY packages/ ./packages/
 COPY apps/web/ ./apps/web/
 
-# Install after all source is present — Bun resolves workspaces correctly
-RUN bun install
+# Install after all source is present
+RUN npm install
 
 # Build shared first
 WORKDIR /app/packages/shared
-RUN bun run build
+RUN npm run build
 
 # Build web
 WORKDIR /app/apps/web
-RUN bun run build
+RUN npm run build
 
-FROM oven/bun:1.3-slim AS runner
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends dumb-init ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache dumb-init
 
-COPY package.json ./package.json
-COPY --from=builder /app/bun.lock ./bun.lock
+COPY package.json package-lock.json ./
 COPY packages/shared/package.json ./packages/shared/
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 COPY apps/web/package.json ./apps/web/
 
-RUN bun install --production
+RUN npm install --omit=dev
 
 COPY --from=builder /app/apps/web/.next/standalone ./
 COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder /app/apps/web/public ./apps/web/public
 
-RUN groupadd --system --gid 1001 bunjs && \
-    useradd --system --uid 1001 --gid bunjs appuser
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -S appuser -u 1001 -G appgroup
 
-RUN chown -R appuser:bunjs /app
+RUN chown -R appuser:appgroup /app
 
 USER appuser
 
@@ -47,4 +46,4 @@ WORKDIR /app/apps/web
 EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["bun", "run", "server.js"]
+CMD ["node", "server.js"]

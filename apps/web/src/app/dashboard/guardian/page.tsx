@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
+import { Users, Plus, Baby, FileText, Siren } from 'lucide-react'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import EmptyState from '@/components/EmptyState'
 import type { GuardianLinkWithUser, GuardianTriggerType } from '@medisync/shared'
@@ -63,18 +64,22 @@ export default function GuardianPage() {
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><LoadingSpinner size="lg" text="Loading..." /></div>
 
+  const guardianIconMap: Record<string, React.ComponentType<any>> = {
+    child_care: Baby, description: FileText, emergency: Siren,
+  }
+
   return (
     <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
       <div className="flex justify-between items-center animate-fade-in" style={{ marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
-            <span className="material-symbols-outlined" style={{ verticalAlign: 'middle', marginRight: '8px', color: 'var(--color-primary)' }}>family_restroom</span>
+            <Users size={22} style={{ verticalAlign: 'middle', marginRight: '8px', color: 'var(--color-primary)' }} />
             Guardian Management
           </h1>
           <p style={{ fontSize: '15px', color: 'var(--color-on-surface-variant)' }}>Manage guardian/proxy access relationships</p>
         </div>
         <button onClick={() => setShowNew(!showNew)} className="btn-primary" style={{ padding: '12px 24px', fontSize: '14px' }}>
-          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span> New Link
+          <Plus size={18} /> New Link
         </button>
       </div>
 
@@ -98,7 +103,7 @@ export default function GuardianPage() {
                 {TRIGGER_TYPES.map(tt => (
                   <button key={tt.value} type="button" onClick={() => setTriggerType(tt.value)}
                     style={{ padding: '16px', borderRadius: '16px', border: `2px solid ${triggerType === tt.value ? 'var(--color-primary)' : 'var(--color-outline-variant)'}`, background: triggerType === tt.value ? 'var(--color-primary-container)' : 'white', cursor: 'pointer', textAlign: 'center' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '24px', display: 'block', marginBottom: '4px', color: 'var(--color-primary)' }}>{tt.icon}</span>
+                    {(() => { const Icon = guardianIconMap[tt.icon]; return Icon ? <Icon size={24} style={{ display: 'block', marginBottom: '4px', color: 'var(--color-primary)' }} /> : null; })()}
                     <span style={{ fontSize: '13px', fontWeight: 600 }}>{tt.label}</span>
                   </button>
                 ))}

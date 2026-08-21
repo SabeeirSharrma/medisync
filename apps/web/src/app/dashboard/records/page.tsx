@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { api } from '@/lib/api'
+import { FolderOpen, Plus, FileText, ArrowRight, Pill, FlaskConical, ScanLine } from 'lucide-react'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import EmptyState from '@/components/EmptyState'
 import type { MedicalRecord } from '@medisync/shared'
@@ -38,13 +39,13 @@ export default function RecordsPage() {
       <div className="flex justify-between items-center animate-fade-in" style={{ marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
-            <span className="material-symbols-outlined" style={{ verticalAlign: 'middle', marginRight: '8px', color: 'var(--color-primary)' }}>folder_open</span>
+            <FolderOpen size={22} style={{ verticalAlign: 'middle', marginRight: '8px', color: 'var(--color-primary)' }} />
             Medical Records
           </h1>
           <p style={{ fontSize: '15px', color: 'var(--color-on-surface-variant)' }}>{records.length} records</p>
         </div>
         <Link href="/dashboard/records/new" className="btn-primary" style={{ padding: '12px 24px', fontSize: '14px' }}>
-          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span> Add Record
+          <Plus size={18} /> Add Record
         </Link>
       </div>
 
@@ -68,15 +69,13 @@ export default function RecordsPage() {
                       <img src={record.attachment_url} alt="Prescription" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--color-primary)' }}>description</span>
+                        <FileText size={48} style={{ color: 'var(--color-primary)' }} />
                       </div>
                     )}
                   </div>
                 ) : (
                   <div style={{ height: '160px', borderRadius: '12px', background: 'var(--color-primary-container)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--color-primary)' }}>
-                      {record.type === 'prescription' ? 'medication' : record.type === 'lab_result' ? 'science' : record.type === 'imaging' ? 'radiology' : 'note'}
-                    </span>
+                    {(() => { const typeIconMap: Record<string, React.ComponentType<any>> = { prescription: Pill, lab_result: FlaskConical, imaging: ScanLine }; const Icon = typeIconMap[record.type] || FileText; return <Icon size={48} style={{ color: 'var(--color-primary)' }} />; })()}
                   </div>
                 )}
               </div>
@@ -88,7 +87,7 @@ export default function RecordsPage() {
               <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)' }}>{record.hospital_name || ''}</p>
               <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--color-outline-variant)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <button onClick={(e) => { e.stopPropagation(); handleDelete(record.id) }} style={{ fontSize: '12px', color: '#b71c1c', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>Delete</button>
-                <span className="material-symbols-outlined" style={{ fontSize: '16px', color: 'var(--color-on-surface-variant)' }}>arrow_forward</span>
+                <ArrowRight size={16} style={{ color: 'var(--color-on-surface-variant)' }} />
               </div>
             </div>
           ))}

@@ -6,6 +6,7 @@ import PatientInfoForm from '@/components/forms/PatientInfoForm'
 import SymptomsForm from '@/components/forms/SymptomsForm'
 import ConditionsForm from '@/components/forms/ConditionsForm'
 import { api } from '@/lib/api'
+import { ClipboardList, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react'
 import type { PatientInfo, DiagnosticInput } from '@medisync/shared'
 
 export default function DiagnosePage() {
@@ -63,7 +64,7 @@ export default function DiagnosePage() {
     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
       <div style={{ marginBottom: '32px' }} className="animate-fade-in">
         <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
-          <span className="material-symbols-outlined" style={{ verticalAlign: 'middle', marginRight: '8px', color: 'var(--color-primary)' }}>clinical_notes</span>
+          <ClipboardList size={22} style={{ verticalAlign: 'middle', marginRight: '8px', color: 'var(--color-primary)' }} />
           Symptom Checker
         </h1>
         <p style={{ fontSize: '15px', color: 'var(--color-on-surface-variant)' }}>
@@ -83,17 +84,17 @@ export default function DiagnosePage() {
         <div className="flex justify-between" style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid var(--color-outline-variant)' }}>
           {step > 1 ? (
             <button onClick={() => setStep(step - 1)} className="btn-secondary" style={{ padding: '12px 24px', fontSize: '14px' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_back</span> Back
+              <ArrowLeft size={18} /> Back
             </button>
           ) : <div />}
           {step < 3 ? (
             <button onClick={handleNext} className="btn-primary" style={{ padding: '12px 24px', fontSize: '14px' }}>
-              Continue <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
+              Continue <ArrowRight size={18} />
             </button>
           ) : (
             <button onClick={handleSubmit} disabled={loading} className="btn-primary disabled:opacity-50" style={{ padding: '12px 24px', fontSize: '14px' }}>
               {loading ? 'Analyzing...' : 'Get Diagnosis'}
-              {!loading && <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>auto_awesome</span>}
+              {!loading && <Sparkles size={18} />}
             </button>
           )}
         </div>

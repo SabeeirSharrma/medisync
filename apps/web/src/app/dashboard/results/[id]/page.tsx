@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { api } from '@/lib/api'
+import { ArrowLeft, Brain, Bandage, FlaskConical, Siren, Sparkles } from 'lucide-react'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 interface CardData { id: string; title: string; icon: string; color: string; bgColor: string; content: string[] }
@@ -94,6 +95,10 @@ export default function ResultsPage() {
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [cards.length, goToNext])
 
+  const iconMap: Record<string, React.ComponentType<any>> = {
+    neurology: Brain, healing: Bandage, science: FlaskConical, emergency: Siren, auto_awesome: Sparkles,
+  }
+
   if (loading) return <div className="min-h-screen flex items-center justify-center"><LoadingSpinner size="lg" text="Loading diagnosis..." /></div>
   if (!diagnosis) return null
 
@@ -103,7 +108,7 @@ export default function ResultsPage() {
     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
       <div style={{ marginBottom: '32px' }} className="animate-fade-in">
         <Link href="/dashboard/history" className="inline-flex items-center gap-1" style={{ fontSize: '14px', color: 'var(--color-primary)', textDecoration: 'none', marginBottom: '16px', fontWeight: 500 }}>
-          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_back</span> Back to History
+          <ArrowLeft size={18} /> Back to History
         </Link>
         <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>Diagnosis Results</h1>
         <p style={{ fontSize: '15px', color: 'var(--color-on-surface-variant)' }}>
@@ -132,7 +137,7 @@ export default function ResultsPage() {
               <>
                 <div className="flex items-center gap-3" style={{ marginBottom: '24px' }}>
                   <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: currentCard.bgColor, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span className="material-symbols-outlined" style={{ color: currentCard.color, fontSize: '24px' }}>{currentCard.icon}</span>
+                    {(() => { const Icon = iconMap[currentCard.icon]; return Icon ? <Icon size={24} style={{ color: currentCard.color }} /> : null; })()}
                   </div>
                   <h2 style={{ fontSize: '22px', fontWeight: 700 }}>{currentCard.title}</h2>
                 </div>

@@ -48,4 +48,6 @@ coverage/
 # supabase
 supabase/.temp/
 
-**.lock
+# lockfiles (keep package-lock.json for npm)
+bun.lock
+bun.lockb

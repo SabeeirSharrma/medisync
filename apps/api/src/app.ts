@@ -10,6 +10,7 @@ import { diagnosesRoutes } from "./routes/diagnoses.js";
 import { accessRequestsRoutes } from "./routes/access-requests.js";
 import { emergencyAccessRoutes } from "./routes/emergency-access.js";
 import { guardianRoutes } from "./routes/guardian.js";
+import { verificationRoutes } from "./routes/verification.js";
 
 export async function buildApp() {
   const app = Fastify({ logger: true });
@@ -37,6 +38,7 @@ export async function buildApp() {
   await app.register(accessRequestsRoutes);
   await app.register(emergencyAccessRoutes);
   await app.register(guardianRoutes);
+  await app.register(verificationRoutes);
 
   return app;
 }

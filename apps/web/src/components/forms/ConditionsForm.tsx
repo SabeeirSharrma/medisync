@@ -1,5 +1,6 @@
 'use client'
 
+import { Heart } from 'lucide-react'
 import TagInput from '@/components/ui/TagInput'
 
 interface ConditionsFormProps {
@@ -38,7 +39,7 @@ export default function ConditionsForm({
   return (
     <div>
       <div className="section-title" style={{ marginBottom: '24px' }}>
-        <span className="material-symbols-outlined" style={{ color: 'var(--color-secondary)', fontSize: '22px' }}>favorite</span>
+        <Heart style={{ color: 'var(--color-secondary)', fontSize: '22px' }} />
         Medical History (Optional)
       </div>
 

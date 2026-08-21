@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, KeyboardEvent } from 'react'
+import { X, Plus } from 'lucide-react'
 
 interface TagInputProps {
   tags: string[]
@@ -97,7 +98,7 @@ export default function TagInput({
                   padding: 0,
                 }}
               >
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>close</span>
+                <X style={{ fontSize: '14px' }} />
               </button>
             </span>
           ))}
@@ -161,7 +162,7 @@ export default function TagInput({
                   onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-primary-container)' }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: '16px', color: 'var(--color-primary)' }}>add</span>
+                  <Plus style={{ fontSize: '16px', color: 'var(--color-primary)' }} />
                   {suggestion}
                 </button>
               ))}

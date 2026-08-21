@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
+import { CheckCircle2, Brain, User, Stethoscope } from 'lucide-react'
 
 export default function RegisterPage() {
   const [username, setUsername] = useState('')
@@ -49,7 +50,7 @@ export default function RegisterPage() {
         <div className="w-full" style={{ maxWidth: '400px' }}>
           <div className="glass-card" style={{ padding: '32px', textAlign: 'center' }}>
             <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'var(--color-tertiary-container)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-              <span className="material-symbols-outlined" style={{ color: 'var(--color-tertiary)', fontSize: '32px' }}>check_circle</span>
+              <CheckCircle2 style={{ color: 'var(--color-tertiary)', fontSize: '32px', width: '32px', height: '32px' }} />
             </div>
             <h1 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '8px' }}>Account Created!</h1>
             <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', marginBottom: '24px' }}>
@@ -67,7 +68,7 @@ export default function RegisterPage() {
       <div className="w-full" style={{ maxWidth: '400px' }}>
         <div className="text-center" style={{ marginBottom: '32px' }}>
           <Link href="/" className="inline-flex items-center gap-2">
-            <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)', fontSize: '32px' }}>neurology</span>
+            <Brain style={{ color: 'var(--color-primary)', fontSize: '32px', width: '32px', height: '32px' }} />
             <span className="font-bold" style={{ fontSize: '22px' }}>MediSync Health</span>
           </Link>
         </div>
@@ -126,7 +127,7 @@ export default function RegisterPage() {
                       gap: '8px',
                     }}
                   >
-                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>{r === 'patient' ? 'person' : 'medical_services'}</span>
+                    <span style={{ fontSize: '20px' }}>{r === 'patient' ? <User style={{ fontSize: '20px', width: '20px', height: '20px' }} /> : <Stethoscope style={{ fontSize: '20px', width: '20px', height: '20px' }} />}</span>
                     {r === 'patient' ? 'Patient' : 'Doctor'}
                   </button>
                 ))}

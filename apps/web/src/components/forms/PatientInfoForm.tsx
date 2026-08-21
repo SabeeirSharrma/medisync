@@ -1,5 +1,6 @@
 'use client'
 
+import { User } from 'lucide-react'
 import type { PatientInfo } from '@medisync/shared'
 
 interface PatientInfoFormProps {
@@ -16,7 +17,7 @@ export default function PatientInfoForm({ data, onChange, errors = {} }: Patient
   return (
     <div>
       <div className="section-title" style={{ marginBottom: '24px' }}>
-        <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)', fontSize: '22px' }}>person</span>
+        <User style={{ color: 'var(--color-primary)', fontSize: '22px' }} />
         Your Information
       </div>
 

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { Brain, Sparkles, ArrowRight, BadgeCheck, FileText, FolderOpen, Shield } from 'lucide-react'
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false)
@@ -23,7 +24,7 @@ export default function HomePage() {
       >
         <div className="flex justify-between items-center h-16" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 32px' }}>
           <Link href="/" className="flex items-center gap-2">
-            <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)', fontSize: '28px' }}>neurology</span>
+            <Brain style={{ color: 'var(--color-primary)', fontSize: '28px', width: '28px', height: '28px' }} />
             <span className="font-bold text-lg">MediSync Health</span>
           </Link>
           <div className="flex items-center gap-3">
@@ -38,7 +39,7 @@ export default function HomePage() {
           <div style={{ display: 'grid', gridTemplateColumns: '7fr 5fr', gap: '48px', alignItems: 'center' }}>
             <div>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ background: 'var(--color-primary-container)', color: 'var(--color-on-primary-container)', fontSize: '13px', fontWeight: 600, marginBottom: '24px' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>sparkle</span>
+                <Sparkles style={{ fontSize: '16px', width: '16px', height: '16px' }} />
                 AI-Powered Health Platform
               </div>
               <h1 className="font-extrabold" style={{ fontSize: '56px', lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: '20px' }}>
@@ -51,7 +52,7 @@ export default function HomePage() {
               <div className="flex gap-4">
                 <Link href="/register" className="btn-primary" style={{ padding: '16px 36px', fontSize: '16px' }}>
                   Get Started Free
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_forward</span>
+                  <ArrowRight style={{ fontSize: '20px', width: '20px', height: '20px' }} />
                 </Link>
                 <Link href="/login" className="btn-secondary" style={{ padding: '16px 36px', fontSize: '16px' }}>Sign In</Link>
               </div>
@@ -61,7 +62,7 @@ export default function HomePage() {
               <div className="glass-card" style={{ position: 'absolute', top: '20px', right: '0', width: '320px', padding: '24px' }}>
                 <div className="flex items-center gap-3" style={{ marginBottom: '16px' }}>
                   <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'var(--color-primary-container)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)', fontSize: '22px' }}>neurology</span>
+                    <Brain style={{ color: 'var(--color-primary)', fontSize: '22px', width: '22px', height: '22px' }} />
                   </div>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: '14px' }}>AI Analysis</div>
@@ -77,7 +78,7 @@ export default function HomePage() {
 
               <div className="tonal-tertiary" style={{ position: 'absolute', bottom: '40px', left: '20px', width: '260px', padding: '20px' }}>
                 <div className="flex items-center gap-2" style={{ marginBottom: '8px' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>verified</span>
+                  <BadgeCheck style={{ fontSize: '20px', width: '20px', height: '20px' }} />
                   <span style={{ fontWeight: 600, fontSize: '13px' }}>Health Score</span>
                 </div>
                 <div style={{ fontSize: '32px', fontWeight: 700 }}>87<span style={{ fontSize: '16px', fontWeight: 500 }}>/100</span></div>
@@ -94,13 +95,13 @@ export default function HomePage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
             {[
-              { icon: 'clinical_notes', title: 'Symptom Analysis', desc: 'Enter symptoms and get instant AI-powered analysis with possible diagnoses.', color: 'primary' },
-              { icon: 'folder_open', title: 'Medical Records', desc: 'Store, manage, and share your medical records securely with healthcare providers.', color: 'tertiary' },
-              { icon: 'shield', title: 'Access Control', desc: 'Patient-controlled data sharing with granular access permissions and emergency protocols.', color: 'secondary' },
+              { Icon: FileText, title: 'Symptom Analysis', desc: 'Enter symptoms and get instant AI-powered analysis with possible diagnoses.', color: 'primary' },
+              { Icon: FolderOpen, title: 'Medical Records', desc: 'Store, manage, and share your medical records securely with healthcare providers.', color: 'tertiary' },
+              { Icon: Shield, title: 'Access Control', desc: 'Patient-controlled data sharing with granular access permissions and emergency protocols.', color: 'secondary' },
             ].map((item) => (
               <div key={item.title} className="glass-card" style={{ padding: '28px' }}>
                 <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: `var(--color-${item.color}-container)`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-                  <span className="material-symbols-outlined" style={{ color: `var(--color-${item.color})`, fontSize: '24px' }}>{item.icon}</span>
+                  <item.Icon style={{ color: `var(--color-${item.color})`, fontSize: '24px', width: '24px', height: '24px' }} />
                 </div>
                 <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>{item.title}</h3>
                 <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', lineHeight: 1.6 }}>{item.desc}</p>
@@ -117,7 +118,7 @@ export default function HomePage() {
             </p>
             <Link href="/register" className="btn-primary" style={{ padding: '16px 40px', fontSize: '16px' }}>
               Start Free
-              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_forward</span>
+              <ArrowRight style={{ fontSize: '20px', width: '20px', height: '20px' }} />
             </Link>
           </div>
         </section>

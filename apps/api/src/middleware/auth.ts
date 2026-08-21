@@ -1,5 +1,5 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
-import { verifySession } from "../lib/session.js";
+import { verifySession, isTokenRevoked } from "../lib/session.js";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -16,6 +16,11 @@ export async function requireAuth(request: FastifyRequest, reply: FastifyReply) 
   const payload = verifySession(sessionCookie) as { userId?: string } | null;
   if (!payload?.userId) {
     return reply.status(401).send({ error: "Invalid session" });
+  }
+
+  // Check if the token has been revoked (server-side session invalidation)
+  if (await isTokenRevoked(sessionCookie)) {
+    return reply.status(401).send({ error: "Session expired" });
   }
 
   request.userId = payload.userId;

@@ -1,5 +1,7 @@
 'use client'
 
+import { Info } from 'lucide-react'
+
 interface MedicalDisclaimerProps {
   variant?: 'banner' | 'inline' | 'footer'
 }
@@ -9,7 +11,7 @@ export default function MedicalDisclaimer({ variant = 'inline' }: MedicalDisclai
     return (
       <div className="disclaimer" style={{ marginBottom: '24px' }}>
         <div className="flex items-center gap-2" style={{ marginBottom: '8px' }}>
-          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>info</span>
+          <Info style={{ fontSize: '20px' }} />
           <span style={{ fontWeight: 600, fontSize: '14px' }}>Medical Disclaimer</span>
         </div>
         <p style={{ fontSize: '13px', lineHeight: 1.6 }}>

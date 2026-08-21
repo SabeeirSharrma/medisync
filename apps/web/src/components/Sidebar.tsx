@@ -4,6 +4,20 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
 import { api } from '@/lib/api'
+import { Brain, LayoutDashboard, ClipboardList, HeartPulse, FolderOpen, Shield, Siren, Users, User, LogOut } from 'lucide-react'
+
+const iconMap: Record<string, React.ComponentType<any>> = {
+  neurology: Brain,
+  dashboard: LayoutDashboard,
+  clinical_notes: ClipboardList,
+  monitor_heart: HeartPulse,
+  folder_open: FolderOpen,
+  shield: Shield,
+  emergency: Siren,
+  family_restroom: Users,
+  account_circle: User,
+  logout: LogOut,
+}
 
 export default function Sidebar() {
   const pathname = usePathname()
@@ -35,7 +49,7 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     try { await api.logout() } catch {}
-    window.location.href = '/register'
+    window.location.href = '/login'
   }
 
   const getDisplayName = () => {
@@ -68,7 +82,7 @@ export default function Sidebar() {
       {/* Desktop Sidebar */}
       <aside className="sidebar">
         <Link href="/" className="sidebar-logo">
-          <span className="material-symbols-outlined">neurology</span>
+          <Brain />
         </Link>
 
         <nav className="sidebar-nav">
@@ -78,7 +92,7 @@ export default function Sidebar() {
               href={link.href}
               className={`sidebar-link ${isActive(link.href) ? 'active' : ''}`}
             >
-              <span className="material-symbols-outlined">{link.icon}</span>
+              {(() => { const Icon = iconMap[link.icon]; return Icon ? <Icon /> : null; })()}
               <span>{link.label}</span>
             </Link>
           ))}
@@ -94,7 +108,7 @@ export default function Sidebar() {
               href={link.href}
               className={`sidebar-link ${isActive(link.href) ? 'active' : ''}`}
             >
-              <span className="material-symbols-outlined">{link.icon}</span>
+              {(() => { const Icon = iconMap[link.icon]; return Icon ? <Icon /> : null; })()}
               <span>{link.label}</span>
             </Link>
           ))}
@@ -109,7 +123,7 @@ export default function Sidebar() {
             className="sidebar-link w-full"
             style={{ cursor: 'pointer' }}
           >
-            <span className="material-symbols-outlined">account_circle</span>
+            <User />
             <span>{getDisplayName()}</span>
           </button>
 
@@ -135,8 +149,8 @@ export default function Sidebar() {
                 onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-primary-container)' }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
               >
-                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>logout</span>
-                Logout → Sign Up
+                <LogOut style={{ fontSize: '20px' }} />
+                Logout
               </button>
             </div>
           )}
@@ -146,7 +160,7 @@ export default function Sidebar() {
       {/* Mobile Top Nav */}
       <header className="top-nav">
         <Link href="/" className="flex items-center gap-2">
-          <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)' }}>neurology</span>
+          <Brain style={{ color: 'var(--color-primary)' }} />
           <span className="font-bold text-lg">MediSync Health</span>
         </Link>
 
@@ -160,7 +174,7 @@ export default function Sidebar() {
               }`}
               style={isActive(link.href) ? { background: 'var(--color-primary)' } : {}}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>{link.icon}</span>
+              {(() => { const Icon = iconMap[link.icon]; return Icon ? <Icon style={{ fontSize: '22px' }} /> : null; })()}
             </Link>
           ))}
 
@@ -170,7 +184,7 @@ export default function Sidebar() {
               className="p-2 rounded-full transition-colors"
               style={{ background: 'rgba(0,0,0,0.05)' }}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>account_circle</span>
+              <User style={{ fontSize: '22px' }} />
             </button>
 
             {showDropdown && (
@@ -189,7 +203,7 @@ export default function Sidebar() {
                   className="w-full px-5 py-3 text-left text-sm font-medium transition-colors flex items-center gap-3"
                   style={{ color: 'var(--color-on-surface-variant)' }}
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>logout</span>
+                  <LogOut style={{ fontSize: '20px' }} />
                   Logout
                 </button>
               </div>

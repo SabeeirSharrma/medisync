@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { api } from '@/lib/api'
+import { ArrowLeft, Trash2, Image, FileText } from 'lucide-react'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import type { MedicalRecord } from '@medisync/shared'
 
@@ -40,7 +41,7 @@ export default function RecordDetailPage() {
     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
       <div style={{ marginBottom: '32px' }} className="animate-fade-in">
         <Link href="/dashboard/records" className="inline-flex items-center gap-1" style={{ fontSize: '14px', color: 'var(--color-primary)', textDecoration: 'none', marginBottom: '16px', fontWeight: 500 }}>
-          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_back</span> Back to Records
+          <ArrowLeft size={18} /> Back to Records
         </Link>
         <div className="flex justify-between items-start">
           <div>
@@ -48,7 +49,7 @@ export default function RecordDetailPage() {
             <p style={{ fontSize: '15px', color: 'var(--color-on-surface-variant)' }}>{record.date}</p>
           </div>
           <button onClick={handleDelete} className="btn-danger" style={{ padding: '10px 20px', fontSize: '13px' }}>
-            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>delete</span> Delete
+            <Trash2 size={16} /> Delete
           </button>
         </div>
       </div>
@@ -56,7 +57,7 @@ export default function RecordDetailPage() {
       {record.attachment_url && (
         <div className="glass-card animate-fade-in" style={{ padding: '24px', marginBottom: '24px' }}>
           <div className="flex items-center gap-2" style={{ marginBottom: '16px' }}>
-            <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)', fontSize: '22px' }}>photo</span>
+            <Image size={22} style={{ color: 'var(--color-primary)' }} />
             <h2 style={{ fontSize: '18px', fontWeight: 600 }}>
               {record.content_type?.startsWith('image/') ? 'Prescription Photo' : 'Attached Document'}
             </h2>
@@ -67,7 +68,7 @@ export default function RecordDetailPage() {
             </div>
           ) : (
             <a href={record.attachment_url} target="_blank" rel="noopener noreferrer" className="glass-card" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px', textDecoration: 'none', color: 'inherit' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--color-primary)' }}>description</span>
+              <FileText size={48} style={{ color: 'var(--color-primary)' }} />
               <div>
                 <p style={{ fontWeight: 600 }}>View Document</p>
                 <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)' }}>Click to open in new tab</p>
