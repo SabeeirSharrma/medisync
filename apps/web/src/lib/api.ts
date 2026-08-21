@@ -1,9 +1,13 @@
 const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 async function request(path: string, options: RequestInit = {}) {
+  const hasBody = options.body != null;
   const res = await fetch(`${BASE}${path}`, {
     credentials: "include",
-    headers: { "Content-Type": "application/json", ...options.headers },
+    headers: {
+      ...(hasBody ? { "Content-Type": "application/json" } : {}),
+      ...options.headers,
+    },
     ...options,
   });
   const data = await res.json();
