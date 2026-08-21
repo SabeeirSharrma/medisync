@@ -22,23 +22,14 @@ FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-RUN apk add --no-cache dumb-init
-
-COPY package.json package-lock.json ./
-COPY packages/shared/package.json ./packages/shared/
-COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
-COPY apps/web/package.json ./apps/web/
-
-RUN npm install --omit=dev
-
-COPY --from=builder /app/apps/web/.next/standalone ./
-COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=builder /app/apps/web/public ./apps/web/public
-
-RUN addgroup -g 1001 -S appgroup && \
+# Standalone output already bundles a minimal traced node_modules — no npm install needed
+RUN apk add --no-cache dumb-init && \
+    addgroup -g 1001 -S appgroup && \
     adduser -S appuser -u 1001 -G appgroup
 
-RUN chown -R appuser:appgroup /app
+COPY --from=builder --chown=appuser:appgroup /app/apps/web/.next/standalone ./
+COPY --from=builder --chown=appuser:appgroup /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder --chown=appuser:appgroup /app/apps/web/public ./apps/web/public
 
 USER appuser
 
