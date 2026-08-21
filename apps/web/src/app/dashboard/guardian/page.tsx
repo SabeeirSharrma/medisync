@@ -129,10 +129,10 @@ export default function GuardianPage() {
               <div className="flex justify-between items-center">
                 <div>
                   <p style={{ fontWeight: 600, fontSize: '15px' }}>
-                    {link.patient_name || link.patient_email || 'Patient'} &harr; {link.guardian_name || link.guardian_email || 'Guardian'}
+                    {(link as any).patientName || link.patient_name || (link as any).patientEmail || link.patient_email || 'Patient'} &harr; {(link as any).guardianName || link.guardian_name || (link as any).guardianEmail || link.guardian_email || 'Guardian'}
                   </p>
                   <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)' }}>
-                    Type: {link.trigger_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                    Type: {((link as any).triggerType || link.trigger_type || '').replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">

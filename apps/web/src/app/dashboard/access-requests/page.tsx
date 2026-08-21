@@ -85,7 +85,7 @@ export default function AccessRequestsPage() {
                   <div key={req.id} className="glass-card" style={{ padding: '20px' }}>
                     <div className="flex justify-between items-center">
                       <div>
-                        <p style={{ fontWeight: 600, fontSize: '15px' }}>{isDoctor ? req.patient_name || req.patient_email : req.doctor_name || req.doctor_email}</p>
+                        <p style={{ fontWeight: 600, fontSize: '15px' }}>{isDoctor ? (req as any).patientName || req.patient_name || (req as any).patientEmail || req.patient_email : (req as any).doctorName || req.doctor_name || (req as any).doctorEmail || req.doctor_email}</p>
                         <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)' }}>Scope: {req.scope?.categories ? req.scope.categories.join(', ') : 'Full access'}</p>
                       </div>
                       {!isDoctor && (
@@ -109,7 +109,7 @@ export default function AccessRequestsPage() {
                   <div key={req.id} className="glass-card" style={{ padding: '16px 20px' }}>
                     <div className="flex justify-between items-center">
                       <div>
-                        <p style={{ fontSize: '14px' }}>{isDoctor ? req.patient_name || req.patient_email : req.doctor_name || req.doctor_email}</p>
+                        <p style={{ fontSize: '14px' }}>{isDoctor ? (req as any).patientName || req.patient_name || (req as any).patientEmail || req.patient_email : (req as any).doctorName || req.doctor_name || (req as any).doctorEmail || req.doctor_email}</p>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className={`badge badge-${req.status}`}>{req.status}</span>

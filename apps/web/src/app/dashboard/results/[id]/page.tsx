@@ -61,7 +61,7 @@ export default function ResultsPage() {
         const data = await api.getDiagnosis(params.id as string)
         if (!data) { router.push('/dashboard'); return }
         setDiagnosis(data)
-        const parsed = parseAIResponse(data.ai_response || '')
+        const parsed = parseAIResponse(data.aiResponse || data.ai_response || '')
         setCards(shuffleArray(parsed))
       } catch { router.push('/dashboard') }
       setLoading(false)
@@ -112,7 +112,7 @@ export default function ResultsPage() {
         </Link>
         <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>Diagnosis Results</h1>
         <p style={{ fontSize: '15px', color: 'var(--color-on-surface-variant)' }}>
-          For {diagnosis.patient_name} &middot; {new Date(diagnosis.created_at).toLocaleDateString()}
+          For {diagnosis.patientName || diagnosis.patient_name || 'Unknown'} &middot; {new Date(diagnosis.createdAt || diagnosis.created_at).toLocaleDateString()}
         </p>
       </div>
 

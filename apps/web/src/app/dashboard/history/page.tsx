@@ -8,7 +8,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import EmptyState from '@/components/EmptyState'
 
 interface Diagnosis {
-  id: string; patient_name: string; severity: string; symptoms: string[]; age: number; created_at: string;
+  id: string; patient_name?: string; patientName?: string; severity: string; symptoms: string[]; age: number; created_at?: string; createdAt?: string;
 }
 
 export default function HistoryPage() {
@@ -58,8 +58,8 @@ export default function HistoryPage() {
             <Link key={diagnosis.id} href={`/dashboard/results/${diagnosis.id}`} className="glass-card animate-fade-in" style={{ animationDelay: `${index * 0.05}s`, padding: '24px', textDecoration: 'none', color: 'inherit', display: 'block' }}>
               <div className="flex justify-between items-start" style={{ marginBottom: '16px' }}>
                 <div>
-                  <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>{diagnosis.patient_name}</h3>
-                  <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)' }}>{new Date(diagnosis.created_at).toLocaleDateString()}</p>
+                  <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>{diagnosis.patientName || diagnosis.patient_name}</h3>
+                  <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)' }}>{new Date(diagnosis.createdAt || diagnosis.created_at || '').toLocaleDateString()}</p>
                 </div>
                 <span className={`badge-${diagnosis.severity}`}>{diagnosis.severity}</span>
               </div>

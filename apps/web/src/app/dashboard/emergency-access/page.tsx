@@ -141,9 +141,9 @@ export default function EmergencyAccessPage() {
                   <div key={a.id} className="glass-card" style={{ padding: '20px', borderLeft: '4px solid #b71c1c' }}>
                     <div className="flex justify-between items-center">
                       <div>
-                        <p style={{ fontWeight: 600 }}>{formatReason(a.reason_code)}</p>
-                        <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)' }}>{a.reason_text}</p>
-                        <p style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)', marginTop: '4px' }}>Expires: {new Date(a.expires_at).toLocaleString()}</p>
+                        <p style={{ fontWeight: 600 }}>{formatReason((a as any).reasonCode || a.reason_code || '')}</p>
+                        <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)' }}>{(a as any).reasonText || a.reason_text}</p>
+                        <p style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)', marginTop: '4px' }}>Expires: {new Date((a as any).expiresAt || a.expires_at).toLocaleString()}</p>
                       </div>
                       <button onClick={() => handleRevoke(a.id)} className="btn-danger" style={{ padding: '8px 16px', fontSize: '13px' }}>Revoke</button>
                     </div>
@@ -160,8 +160,8 @@ export default function EmergencyAccessPage() {
                   <div key={a.id} className="glass-card" style={{ padding: '16px 20px' }}>
                     <div className="flex justify-between items-center">
                       <div>
-                        <p style={{ fontSize: '14px' }}>{formatReason(a.reason_code)}</p>
-                        <p style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)' }}>{new Date(a.created_at).toLocaleDateString()}</p>
+                        <p style={{ fontSize: '14px' }}>{formatReason((a as any).reasonCode || a.reason_code || '')}</p>
+                        <p style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)' }}>{new Date((a as any).createdAt || a.created_at).toLocaleDateString()}</p>
                       </div>
                       <span className={`badge badge-${a.status}`}>{a.status}</span>
                     </div>
