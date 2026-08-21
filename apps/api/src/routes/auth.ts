@@ -196,12 +196,16 @@ export async function authRoutes(app: FastifyInstance) {
   });
 
   app.post("/api/auth/logout", async (request, reply) => {
-    // Server-side session invalidation: revoke the current token
     const sessionCookie = request.cookies?.["medisync-session"];
     if (sessionCookie) {
       await revokeToken(sessionCookie);
     }
-    reply.clearCookie("medisync-session", { path: "/" });
+    reply.clearCookie("medisync-session", {
+      path: "/",
+      httpOnly: true,
+      secure: config.cookieSecure,
+      sameSite: "lax",
+    });
     return reply.send({ ok: true });
   });
 

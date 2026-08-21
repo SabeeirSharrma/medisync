@@ -49,7 +49,7 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     try { await api.logout() } catch {}
-    window.location.href = '/register'
+    window.location.href = '/login'
   }
 
   const getDisplayName = () => {
