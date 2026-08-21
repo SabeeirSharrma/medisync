@@ -22,13 +22,14 @@ function parseAIResponse(aiResponse: string): CardData[] {
   if (!aiResponse) return []
   const cards: CardData[] = []
   const sections = [
+    { key: 'CLINICAL SUMMARY', title: 'AI Clinical Summary', icon: 'auto_awesome', color: '#014492', bgColor: '#d1e4ff' },
     { key: 'POSSIBLE DIAGNOSES', title: 'Possible Diagnoses', icon: 'neurology', color: '#3525cd', bgColor: '#e8deff' },
     { key: 'IMMEDIATE SOLUTIONS', title: 'Immediate Solutions', icon: 'healing', color: '#005338', bgColor: '#6ffabe' },
     { key: 'RECOMMENDED TESTS', title: 'Recommended Tests', icon: 'science', color: '#6b38d4', bgColor: '#e8deff' },
     { key: 'WHEN TO SEEK EMERGENCY', title: 'Emergency Care', icon: 'emergency', color: '#b71c1c', bgColor: '#ffdad6' },
   ]
   for (const section of sections) {
-    const regex = new RegExp(`${section.key}[\\s:]*\\n([\\s\\S]*?)(?=\\n(?:POSSIBLE DIAGNOSES|IMMEDIATE SOLUTIONS|RECOMMENDED TESTS|WHEN TO SEEK|$))`, 'i')
+    const regex = new RegExp(`${section.key}[\\s:]*\\n([\\s\\S]*?)(?=(?:\\n(?:CLINICAL SUMMARY|POSSIBLE DIAGNOSES|IMMEDIATE SOLUTIONS|RECOMMENDED TESTS|WHEN TO SEEK)|$))`, 'i')
     const match = aiResponse.match(regex)
     if (match) {
       const items = match[1].trim().split('\n').map(l => l.replace(/^[•\-\d\.\*\s]+/, '').trim()).filter(l => l.length > 3)

@@ -5,11 +5,42 @@ import { diagnoses } from "../db/schema.js";
 import { requireAuth } from "../middleware/auth.js";
 import { config } from "../config.js";
 
-function buildPrompt(input: any): string {
-  const { patientInfo, symptoms, existingConditions, symptomDuration, severity } = input;
-  return `You are a medical AI assistant. Analyze the following patient information and provide a diagnosis.
+interface DiagnosisInput {
+  patientInfo: {
+    name: string;
+    age: number;
+    gender: string;
+    weight?: number | string | null;
+    height?: number | string | null;
+    allergies?: string[];
+    currentMedications?: string[];
+  };
+  symptoms: string[];
+  existingConditions: string[];
+  symptomDuration: string;
+  severity: string;
+}
 
-Patient Information:
+const SYSTEM_PROMPT = `You are MediSync's clinical decision-support assistant: an evidence-based medical AI whose output is reviewed by patients and clinicians.
+Analyze the patient data and respond ONLY with genuine clinical content in exactly these five sections, using these exact headers in this order:
+
+CLINICAL SUMMARY:
+POSSIBLE DIAGNOSES:
+IMMEDIATE SOLUTIONS:
+RECOMMENDED TESTS:
+WHEN TO SEEK EMERGENCY:
+
+Rules:
+- Base every statement strictly on the provided symptoms, history, and demographics; never invent findings that were not given.
+- Rank differential diagnoses by likelihood with brief clinical reasoning (key symptoms, epidemiology, pathophysiology).
+- Recommend standard first-line investigations and management consistent with current clinical guidelines.
+- List concrete red-flag symptoms that warrant emergency care.
+- Do not output any text outside the five sections.
+- End the final section with this exact line: "This is not a medical diagnosis. Consult a licensed physician."`;
+
+function buildPrompt(input: DiagnosisInput): string {
+  const { patientInfo, symptoms, existingConditions, symptomDuration, severity } = input;
+  return `Patient Information:
 - Name: ${patientInfo.name}
 - Age: ${patientInfo.age}
 - Gender: ${patientInfo.gender}
@@ -22,15 +53,10 @@ Severity: ${severity}
 
 Medical History:
 - Existing Conditions: ${existingConditions.length > 0 ? existingConditions.join(", ") : "None"}
-- Allergies: ${patientInfo.allergies.length > 0 ? patientInfo.allergies.join(", ") : "None"}
-- Current Medications: ${patientInfo.currentMedications.length > 0 ? patientInfo.currentMedications.join(", ") : "None"}
+- Allergies: ${patientInfo.allergies && patientInfo.allergies.length > 0 ? patientInfo.allergies.join(", ") : "None"}
+- Current Medications: ${patientInfo.currentMedications && patientInfo.currentMedications.length > 0 ? patientInfo.currentMedications.join(", ") : "None"}
 
-Please provide:
-1. POSSIBLE DIAGNOSES (list 2-4 possible conditions with brief explanations)
-2. IMMEDIATE SOLUTIONS (practical steps for relief)
-3. RECOMMENDED TESTS (diagnostic tests to confirm)
-4. WHEN TO SEEK EMERGENCY (red flag symptoms)
-`;
+Provide the clinical analysis in the required sections.`;
 }
 
 function generateMockResponse(input: any): string {
@@ -58,36 +84,41 @@ WHEN TO SEEK EMERGENCY:
 - Any sudden worsening of symptoms`;
 }
 
-async function callAI(input: any): Promise<string> {
-  const prompt = buildPrompt(input);
-  const aiEndpoint = config.openaiApiKey
-    ? "https://api.openai.com/v1/chat/completions"
-    : null;
-
-  if (aiEndpoint && config.openaiApiKey) {
-    try {
-      const res = await fetch(aiEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${config.openaiApiKey}`,
-        },
-        body: JSON.stringify({
-          model: config.openaiModel,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
-      if (res.ok) {
-        const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-        const content = data.choices?.[0]?.message?.content;
-        if (content) return content;
-      }
-    } catch (err) {
-      console.error("AI call failed, using mock:", err);
-    }
+async function callAI(input: DiagnosisInput): Promise<string> {
+  if (!config.aiApiKey) {
+    if (config.aiMock) return generateMockResponse(input);
+    throw new Error("AI_API_KEY is not configured");
   }
 
-  return generateMockResponse(input);
+  const res = await fetch(`${config.aiBaseUrl}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${config.aiApiKey}`,
+      "HTTP-Referer": config.corsOrigin[0] || "http://localhost:3000",
+      "X-Title": "MediSync",
+    },
+    body: JSON.stringify({
+      model: config.aiModel,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: buildPrompt(input) },
+      ],
+      temperature: 0.3,
+      max_tokens: 2000,
+    }),
+    signal: AbortSignal.timeout(90_000),
+  });
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(`AI provider returned ${res.status}: ${detail.slice(0, 300)}`);
+  }
+
+  const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) throw new Error("AI provider returned an empty response");
+  return content;
 }
 
 export async function diagnosesRoutes(app: FastifyInstance) {
@@ -122,7 +153,13 @@ export async function diagnosesRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: "At least one symptom is required" });
     }
 
-    const aiResponse = await callAI({ patientInfo, symptoms, existingConditions, symptomDuration, severity });
+    let aiResponse: string;
+    try {
+      aiResponse = await callAI({ patientInfo, symptoms, existingConditions, symptomDuration, severity });
+    } catch (err) {
+      console.error("AI diagnosis generation failed:", err);
+      return reply.status(502).send({ error: "AI diagnosis service is unavailable. Please try again later." });
+    }
 
     const [d] = await db
       .insert(diagnoses)
